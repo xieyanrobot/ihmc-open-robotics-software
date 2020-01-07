@@ -1,14 +1,14 @@
 package us.ihmc.quadrupedRobotics.planning.comPlanning;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import us.ihmc.commonWalkingControlModules.dynamicPlanning.comPlanning.ContactState;
-import us.ihmc.commonWalkingControlModules.dynamicPlanning.comPlanning.ContactStateProvider;
+import us.ihmc.comTrajectoryPlanning.ContactState;
+import us.ihmc.comTrajectoryPlanning.ContactStateProvider;
 import us.ihmc.euclid.referenceFrame.FramePoint3D;
 import us.ihmc.euclid.referenceFrame.interfaces.FramePoint3DReadOnly;
 import us.ihmc.quadrupedRobotics.planning.QuadrupedCenterOfPressureTools;
 import us.ihmc.robotics.robotSide.QuadrantDependentList;
 import us.ihmc.robotics.robotSide.RobotQuadrant;
-import us.ihmc.robotics.time.TimeInterval;
+import us.ihmc.commons.time.TimeInterval;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,13 +1,13 @@
 package us.ihmc.quadrupedRobotics.planning.comPlanning;
 
-import us.ihmc.commonWalkingControlModules.dynamicPlanning.comPlanning.ContactStateProvider;
+import us.ihmc.comTrajectoryPlanning.ContactStateProvider;
 import us.ihmc.commons.MathTools;
 import us.ihmc.commons.lists.RecyclingArrayList;
 import us.ihmc.euclid.referenceFrame.interfaces.FramePoint3DReadOnly;
 import us.ihmc.quadrupedBasics.gait.QuadrupedTimedStep;
 import us.ihmc.robotics.robotSide.QuadrantDependentList;
 import us.ihmc.robotics.robotSide.RobotQuadrant;
-import us.ihmc.robotics.time.TimeIntervalTools;
+import us.ihmc.commons.time.TimeIntervalTools;
 
 import java.util.Comparator;
 import java.util.List;

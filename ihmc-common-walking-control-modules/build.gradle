@@ -36,6 +36,7 @@ mainDependencies {
    api("us.ihmc:ihmc-robotics-toolkit:source")
    api("us.ihmc:ihmc-java-toolkit:source")
    api("us.ihmc:ihmc-humanoid-robotics:source")
+   api("us.ihmc:ihmc-com-trajectory-planning:source")
 }
 
 testDependencies {
