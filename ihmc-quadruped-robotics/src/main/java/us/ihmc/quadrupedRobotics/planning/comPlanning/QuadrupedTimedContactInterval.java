@@ -1,18 +1,18 @@
 package us.ihmc.quadrupedRobotics.planning.comPlanning;
 
-import us.ihmc.comTrajectoryPlanning.TimedContactPhase;
+import us.ihmc.comTrajectoryPlanning.TimedContactInterval;
 import us.ihmc.euclid.referenceFrame.FramePoint3D;
 import us.ihmc.euclid.referenceFrame.ReferenceFrame;
 import us.ihmc.quadrupedRobotics.planning.ContactState;
 import us.ihmc.robotics.robotSide.QuadrantDependentList;
 import us.ihmc.robotics.robotSide.RobotQuadrant;
 
-public class QuadrupedTimedContactPhase extends TimedContactPhase
+public class QuadrupedTimedContactInterval extends TimedContactInterval
 {
    private final QuadrantDependentList<ContactState> contactState;
    private final QuadrantDependentList<FramePoint3D> solePosition;
 
-   public QuadrupedTimedContactPhase()
+   public QuadrupedTimedContactInterval()
    {
       contactState = new QuadrantDependentList<>();
       solePosition = new QuadrantDependentList<>();
@@ -23,7 +23,7 @@ public class QuadrupedTimedContactPhase extends TimedContactPhase
       }
    }
 
-   public void set(QuadrupedTimedContactPhase other)
+   public void set(QuadrupedTimedContactInterval other)
    {
       super.set(other);
       setContactState(other.getContactState());

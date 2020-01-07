@@ -22,7 +22,7 @@ import us.ihmc.robotics.robotSide.RobotEnd;
 import us.ihmc.robotics.robotSide.RobotQuadrant;
 import us.ihmc.robotics.robotSide.RobotSide;
 
-public class QuadrupedCoPWaypointCalculator implements CoPWaypointCalculator<QuadrupedTimedContactPhase>
+public class QuadrupedCoPWaypointCalculator implements CoPWaypointCalculator<QuadrupedTimedContactInterval>
 {
    private final QuadrantDependentList<MutableDouble> normalizedContactPressures = new QuadrantDependentList<>(MutableDouble::new);
 
@@ -35,7 +35,7 @@ public class QuadrupedCoPWaypointCalculator implements CoPWaypointCalculator<Qua
       this.plannerParameters = plannerParameters;
    }
 
-   public void computeCoPWaypoint(FixedFramePoint3DBasics copWaypointToPack, QuadrupedTimedContactPhase timedContactPhase)
+   public void computeCoPWaypoint(FixedFramePoint3DBasics copWaypointToPack, QuadrupedTimedContactInterval timedContactPhase)
    {
       QuadrantDependentList<FramePoint3D> solePosition = timedContactPhase.getSolePosition();
       QuadrantDependentList<ContactState> contactState = timedContactPhase.getContactState();

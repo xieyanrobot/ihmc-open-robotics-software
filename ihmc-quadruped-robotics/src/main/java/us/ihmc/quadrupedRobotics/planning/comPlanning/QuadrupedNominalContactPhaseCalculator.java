@@ -23,7 +23,7 @@ public class QuadrupedNominalContactPhaseCalculator
    private boolean resetStartingFootPositions = true;
 
    private final RecyclingArrayList<QuadrupedStepTransition> stepTransitions = new RecyclingArrayList<>(QuadrupedStepTransition::new);
-   private final RecyclingArrayList<QuadrupedTimedContactPhase> contactPhases = new RecyclingArrayList<>(QuadrupedTimedContactPhase::new);
+   private final RecyclingArrayList<QuadrupedTimedContactInterval> contactPhases = new RecyclingArrayList<>(QuadrupedTimedContactInterval::new);
 
    private final QuadrantDependentList<ContactState> contactState;
    private final QuadrantDependentList<FramePoint3D> solePosition;
@@ -52,14 +52,14 @@ public class QuadrupedNominalContactPhaseCalculator
       resetStartingFootPositions = true;
    }
 
-   public List<QuadrupedTimedContactPhase> getContactPhases()
+   public List<QuadrupedTimedContactInterval> getContactPhases()
    {
       return contactPhases;
    }
 
-   public List<QuadrupedTimedContactPhase> computeFromSteps(List<? extends QuadrupedTimedStep> stepSequence,
-                                                            QuadrantDependentList<? extends ReferenceFrame> soleFrames,
-                                                            List<RobotQuadrant> currentFeetInContact, double currentTime, double timeAtStartOfState)
+   public List<QuadrupedTimedContactInterval> computeFromSteps(List<? extends QuadrupedTimedStep> stepSequence,
+                                                               QuadrantDependentList<? extends ReferenceFrame> soleFrames,
+                                                               List<RobotQuadrant> currentFeetInContact, double currentTime, double timeAtStartOfState)
    {
       stepTransitions.clear();
       contactPhases.clear();
@@ -129,7 +129,7 @@ public class QuadrupedNominalContactPhaseCalculator
       // remove any transitions that already happened
       stepTransitions.removeIf(transition -> transition.getTransitionTime() < timeAtStartOfState);
 
-      QuadrupedTimedContactPhase contactPhase = createNewContactPhase(timeAtStartOfState, contactState, solePosition);
+      QuadrupedTimedContactInterval contactPhase = createNewContactPhase(timeAtStartOfState, contactState, solePosition);
 
       // compute transition time and center of pressure for each time interval
       for (int i = 0; i < stepTransitions.size(); i++)
@@ -174,12 +174,12 @@ public class QuadrupedNominalContactPhaseCalculator
 
    private final ConvexPolygon2D tempPolygon = new ConvexPolygon2D();
 
-   private QuadrupedTimedContactPhase createNewContactPhase(double startTime, QuadrantDependentList<ContactState> contactState,
-                                                            QuadrantDependentList<FramePoint3D> solePositions)
+   private QuadrupedTimedContactInterval createNewContactPhase(double startTime, QuadrantDependentList<ContactState> contactState,
+                                                               QuadrantDependentList<FramePoint3D> solePositions)
    {
       if (contactPhases.size() < maxCapacity)
       {
-         QuadrupedTimedContactPhase contactPhase = contactPhases.add();
+         QuadrupedTimedContactInterval contactPhase = contactPhases.add();
          contactPhase.getTimeInterval().setStartTime(startTime);
          contactPhase.setContactState(contactState);
          contactPhase.setSolePosition(solePositions);

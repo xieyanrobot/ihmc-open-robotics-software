@@ -48,7 +48,7 @@ public class QuadrupedCoMTrajectoryPlanner implements DCMPlannerInterface
 
    private final QuadrantDependentList<MovingReferenceFrame> soleFrames;
    private final QuadrupedNominalContactPhaseCalculator nominalContactPhaseCalculator;
-   private final ContactSequenceCalculator<QuadrupedTimedContactPhase> contactSequenceCalculator;
+   private final ContactSequenceCalculator<QuadrupedTimedContactInterval> contactSequenceCalculator;
    private final CoMTrajectoryPlanner comTrajectoryPlanner;
 
    public QuadrupedCoMTrajectoryPlanner(DCMPlannerParameters plannerParameters, QuadrantDependentList<MovingReferenceFrame> soleFrames, double gravity,
@@ -116,7 +116,7 @@ public class QuadrupedCoMTrajectoryPlanner implements DCMPlannerInterface
       {
          nominalContactPhaseCalculator.computeFromSteps(stepSequence, soleFrames, currentFeetInContact, currentTime, timeAtStartOfState.getDoubleValue());
 
-         List<QuadrupedTimedContactPhase> contactPhases = nominalContactPhaseCalculator.getContactPhases();
+         List<QuadrupedTimedContactInterval> contactPhases = nominalContactPhaseCalculator.getContactPhases();
          double timeInPhase = currentTime - timeAtStartOfState.getDoubleValue();
          timeInContactPhase.set(timeInPhase);
 
