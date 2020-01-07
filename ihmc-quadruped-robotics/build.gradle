@@ -42,6 +42,7 @@ mainDependencies {
    api("us.ihmc:ihmc-state-estimation:source")
    api("us.ihmc:ihmc-simulation-toolkit:source")
    api("us.ihmc:ihmc-system-identification:source")
+   api("us.ihmc:ihmc-com-trajectory-planning:source")
 }
 
 testDependencies {
