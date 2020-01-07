@@ -8,7 +8,7 @@ import us.ihmc.euclid.tuple3D.interfaces.Tuple3DReadOnly;
 import us.ihmc.mecano.frames.MovingReferenceFrame;
 import us.ihmc.mecano.spatial.Twist;
 
-class TranslationMovingReferenceFrame extends MovingReferenceFrame
+public class TranslationMovingReferenceFrame extends MovingReferenceFrame
 {
    public final FrameVector3D originVector;
 
