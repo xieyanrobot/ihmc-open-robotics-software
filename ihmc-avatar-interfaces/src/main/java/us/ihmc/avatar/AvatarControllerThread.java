@@ -52,7 +52,7 @@ import us.ihmc.yoVariables.variable.YoBoolean;
 import us.ihmc.yoVariables.variable.YoDouble;
 import us.ihmc.yoVariables.variable.YoLong;
 
-public class AvatarControllerThread
+public class AvatarControllerThread implements AvatarControllerThreadInterface
 {
    private static final boolean CREATE_DYNAMICALLY_CONSISTENT_NULLSPACE_EVALUATOR = false;
    private static final boolean SHOW_INERTIA_GRAPHICS = false;
@@ -257,6 +257,7 @@ public class AvatarControllerThread
       humanoidRobotContextData.setEstimatorRan(false);
    }
 
+   @Override
    public void run()
    {
       runController.set(humanoidRobotContextData.getEstimatorRan());
@@ -293,6 +294,7 @@ public class AvatarControllerThread
       }
    }
 
+   @Override
    public YoVariableRegistry getYoVariableRegistry()
    {
       return registry;
@@ -313,16 +315,19 @@ public class AvatarControllerThread
       robotController.addRobotController(controller);
    }
 
+   @Override
    public FullHumanoidRobotModel getFullRobotModel()
    {
       return controllerFullRobotModel;
    }
 
+   @Override
    public HumanoidRobotContextData getHumanoidRobotContextData()
    {
       return humanoidRobotContextData;
    }
 
+   @Override
    public JointDesiredOutputListBasics getDesiredJointDataHolder()
    {
       return humanoidRobotContextData.getJointDesiredOutputList();
