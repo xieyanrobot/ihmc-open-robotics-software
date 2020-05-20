@@ -11,7 +11,6 @@ import us.ihmc.commons.time.Stopwatch;
 import us.ihmc.communication.ROS2PlanarRegionsInput;
 import us.ihmc.euclid.geometry.LineSegment3D;
 import us.ihmc.euclid.geometry.interfaces.Pose3DReadOnly;
-import us.ihmc.euclid.tuple2D.Vector2D;
 import us.ihmc.euclid.tuple3D.Point3D;
 import us.ihmc.footstepPlanning.graphSearch.VisibilityGraphPathPlanner;
 import us.ihmc.humanoidBehaviors.tools.RemoteEnvironmentMapInterface;
@@ -339,7 +338,7 @@ public class LookAndStepBehavior implements BehaviorInterface
 
       footstepPlannerParameters.setIdealFootstepLength(lookAndStepParameters.get(LookAndStepBehaviorParameters.idealFootstepLengthOverride));
       footstepPlannerParameters.setWiggleInsideDelta(lookAndStepParameters.get(LookAndStepBehaviorParameters.wiggleInsideDeltaOverride));
-      footstepPlannerParameters.setCliffHeightToAvoid(lookAndStepParameters.get(LookAndStepBehaviorParameters.cliffHeightToAvoidOverride));
+      footstepPlannerParameters.setCliffBaseHeightToAvoid(lookAndStepParameters.get(LookAndStepBehaviorParameters.cliffBaseHeightToAvoidOverride));
       footstepPlannerParameters.setEnableConcaveHullWiggler(lookAndStepParameters.get(LookAndStepBehaviorParameters.enableConcaveHullWigglerOverride));
 
       FootstepPlannerRequest footstepPlannerRequest = new FootstepPlannerRequest();
