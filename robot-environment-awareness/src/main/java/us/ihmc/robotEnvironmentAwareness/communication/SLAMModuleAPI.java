@@ -60,8 +60,8 @@ public class SLAMModuleAPI
    public static final Topic<Boolean> SLAMVizClear = Root.child(UI).topic(Clear);
    public static final Topic<Boolean> SensorPoseHistoryClear = Root.child(UI).child(SensorFrame).topic(Clear);
 
-   public static final Topic<Boolean> ShowFootstepStatusViz = Root.child(UI).child(Footstep).topic(Enable);
-   public static final Topic<Boolean> ClearFootstepStatusViz = Root.child(UI).child(Footstep).topic(Clear);
+   public static final Topic<Boolean> ShowFootstepDataViz = Root.child(UI).child(Footstep).topic(Enable);
+   public static final Topic<Boolean> ClearFootstepDataViz = Root.child(UI).child(Footstep).topic(Clear);
    public static final Topic<FootstepDataMessage> FootstepDataState = Root.child(UI).child(Footstep).topic(Data);
 
    // TODO: refactor. the name.

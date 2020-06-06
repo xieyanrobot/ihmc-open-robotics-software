@@ -28,9 +28,9 @@ import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.StereoVisionPointCl
 
 public class SLAMMeshViewer
 {
-   private static final int SLOW_PACE_UPDATE_PERIOD = 2000;
-   private static final int MEDIUM_PACE_UPDATE_PERIOD = 100;
-   private static final int HIGH_PACE_UPDATE_PERIOD = 50;
+   private static final int SLOW_PACE_UPDATE_PERIOD = 1000;
+   private static final int MEDIUM_PACE_UPDATE_PERIOD = 50;
+   private static final int HIGH_PACE_UPDATE_PERIOD = 10;
 
    private final Group root = new Group();
 
@@ -43,6 +43,7 @@ public class SLAMMeshViewer
    private final PlanarRegionsMeshBuilder planarRegionsMeshBuilder;
    private final OccupancyMapMeshBuilder occupancyMapViewer;
    private final StereoVisionPointCloudViewer latestBufferViewer;
+   private final FootstepMeshViewer footstepMeshViewer;
 
    private final List<AtomicReference<Boolean>> enableTopicList = new ArrayList<>();
    private final Map<AtomicReference<Boolean>, Node> enableTopicToNode = new HashMap<>();
@@ -63,13 +64,16 @@ public class SLAMMeshViewer
                                                             SLAMModuleAPI.ShowLatestFrame,
                                                             SLAMModuleAPI.SLAMVizClear);
 
+      footstepMeshViewer = new FootstepMeshViewer(uiMessager);
+
       occupancyMapViewer.getRoot().setMouseTransparent(true);
       latestBufferViewer.getRoot().setMouseTransparent(true);
-      root.getChildren().addAll(planarRegionMeshView, occupancyMapViewer.getRoot(), latestBufferViewer.getRoot());
+      root.getChildren().addAll(planarRegionMeshView, occupancyMapViewer.getRoot(), latestBufferViewer.getRoot(), footstepMeshViewer.getRoot());
 
       addViewer(uiMessager, planarRegionMeshView, SLAMModuleAPI.ShowPlanarRegionsMap);
       addViewer(uiMessager, occupancyMapViewer.getRoot(), SLAMModuleAPI.ShowSLAMOctreeMap);
       addViewer(uiMessager, latestBufferViewer.getRoot(), SLAMModuleAPI.ShowLatestFrame);
+      addViewer(uiMessager, footstepMeshViewer.getRoot(), SLAMModuleAPI.ShowFootstepDataViz);
 
       renderMeshAnimation = new AnimationTimer()
       {
@@ -78,6 +82,7 @@ public class SLAMMeshViewer
          {
             occupancyMapViewer.render();
             latestBufferViewer.render();
+            footstepMeshViewer.render();
 
             if (planarRegionsMeshBuilder.hasNewMeshAndMaterial())
                updateMeshView(planarRegionMeshView, planarRegionsMeshBuilder.pollMeshAndMaterial());
@@ -141,6 +146,7 @@ public class SLAMMeshViewer
       meshBuilderScheduledFutures.add(executorService.scheduleAtFixedRate(planarRegionsMeshBuilder, 0, HIGH_PACE_UPDATE_PERIOD, TimeUnit.MILLISECONDS));
       meshBuilderScheduledFutures.add(executorService.scheduleAtFixedRate(occupancyMapViewer, 0, SLOW_PACE_UPDATE_PERIOD, TimeUnit.MILLISECONDS));
       meshBuilderScheduledFutures.add(executorService.scheduleAtFixedRate(latestBufferViewer, 0, MEDIUM_PACE_UPDATE_PERIOD, TimeUnit.MILLISECONDS));
+      meshBuilderScheduledFutures.add(executorService.scheduleAtFixedRate(footstepMeshViewer, 0, MEDIUM_PACE_UPDATE_PERIOD, TimeUnit.MILLISECONDS));
       meshBuilderScheduledFutures.add(executorService.scheduleAtFixedRate(createViewersController(), 0, HIGH_PACE_UPDATE_PERIOD, TimeUnit.MILLISECONDS));
    }
 
