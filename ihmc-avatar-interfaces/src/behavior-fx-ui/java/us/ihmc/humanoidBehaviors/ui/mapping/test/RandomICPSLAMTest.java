@@ -272,7 +272,7 @@ public class RandomICPSLAMTest
       RandomICPSLAM slam = new RandomICPSLAM(octreeResolution);
       SLAMViewer slamViewer = new SLAMViewer();
 
-      slam.updateParameters(parameters);
+      slam.updateIcpSlamParameters(parameters);
       slam.addKeyFrame(messages.get(47));
       slamViewer.addSensorPose(slam.getLatestFrame().getSensorPose(), Color.BLUE);
       slamViewer.addPointCloud(slam.getLatestFrame().getPointCloud(), Color.BLUE);
@@ -322,7 +322,7 @@ public class RandomICPSLAMTest
       RandomICPSLAM slam = new RandomICPSLAM(octreeResolution);
       SLAMViewer slamViewer = new SLAMViewer();
 
-      slam.updateParameters(parameters);
+      slam.updateIcpSlamParameters(parameters);
       slam.addKeyFrame(messageOne);
       slamViewer.addSensorPose(slam.getLatestFrame().getSensorPose(), Color.BLUE);
       slamViewer.addPointCloud(slam.getLatestFrame().getPointCloud(), Color.BLUE);
@@ -365,7 +365,7 @@ public class RandomICPSLAMTest
       }
       slamViewer.addOctree(slam.getOctree(), Color.BLUE, octreeResolution, true);
       parameters.setWindowMargin(0.02);
-      slam.updateParameters(parameters);
+      slam.updateIcpSlamParameters(parameters);
 
       slam.addFrame(messages.get(frameIndexToLookAt));
       slamViewer.addStereoMessage(messages.get(frameIndexToLookAt), Color.BLACK);

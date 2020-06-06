@@ -22,7 +22,6 @@ public class SLAMBasics implements SLAMInterface
    protected PlanarRegionsList planarRegionsMap;
    protected final ConcaveHullFactoryParameters concaveHullFactoryParameters = new ConcaveHullFactoryParameters();
    protected final PolygonizerParameters polygonizerParameters = new PolygonizerParameters();
-   protected final CustomRegionMergeParameters customRegionMergeParameters = new CustomRegionMergeParameters();
    protected final PlanarRegionSegmentationParameters planarRegionSegmentationParameters = new PlanarRegionSegmentationParameters();
 
    public SLAMBasics(double octreeResolution)
@@ -31,6 +30,21 @@ public class SLAMBasics implements SLAMInterface
 
       planarRegionSegmentationParameters.setMaxDistanceFromPlane(0.03);
       planarRegionSegmentationParameters.setMinRegionSize(150);
+   }
+
+   public void setPlanarRegionSegmentationParameters(PlanarRegionSegmentationParameters planarRegionSegmentationParameters)
+   {
+      this.planarRegionSegmentationParameters.set(planarRegionSegmentationParameters);
+   }
+
+   public void setPolygonizerParameters(PolygonizerParameters polygonizerParameters)
+   {
+      this.polygonizerParameters.set(polygonizerParameters);
+   }
+
+   public void setConcaveHullFactoryParameters(ConcaveHullFactoryParameters concaveHullFactoryParameters)
+   {
+      this.concaveHullFactoryParameters.set(concaveHullFactoryParameters);
    }
 
    @Override

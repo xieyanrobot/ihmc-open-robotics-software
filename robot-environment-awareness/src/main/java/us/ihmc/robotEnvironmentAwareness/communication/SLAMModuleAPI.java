@@ -11,13 +11,17 @@ import us.ihmc.messager.MessagerAPIFactory.Topic;
 import us.ihmc.messager.MessagerAPIFactory.TopicTheme;
 import us.ihmc.messager.MessagerAPIFactory.TypedTopicTheme;
 import us.ihmc.robotEnvironmentAwareness.communication.packets.NormalOcTreeMessage;
+import us.ihmc.robotEnvironmentAwareness.geometry.ConcaveHullFactoryParameters;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.PlanarRegionSegmentationParameters;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.PolygonizerParameters;
 import us.ihmc.robotEnvironmentAwareness.slam.RandomICPSLAMParameters;
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.OcTreeMeshBuilder.DisplayType;
 
 public class SLAMModuleAPI
 {
    private static final MessagerAPIFactory apiFactory = new MessagerAPIFactory();
-   private static final Category Root = apiFactory.createRootCategory(apiFactory.createCategoryTheme("SLAM"));
+   private static final CategoryTheme SLAM = apiFactory.createCategoryTheme("SLAM");
+   private static final Category Root = apiFactory.createRootCategory(SLAM);
 
    private static final CategoryTheme Module = apiFactory.createCategoryTheme("Module");
    private static final CategoryTheme UI = apiFactory.createCategoryTheme("UI");
@@ -63,7 +67,10 @@ public class SLAMModuleAPI
    
    public static final Topic<PlanarRegionsListMessage> SLAMPlanarRegionsState = Root.child(Module).child(PlanarRegions).topic(Data);
    public static final Topic<RandomICPSLAMParameters> SLAMParameters = Root.child(Module).topic(Parameters);
-   
+   public static final Topic<PolygonizerParameters> PolygonizerParameters = topic("PolygonizerParameters");
+   public static final Topic<ConcaveHullFactoryParameters> ConcaveHullFactoryParameters = topic("ConcaveHullFactoryParameters");
+   public static final Topic<PlanarRegionSegmentationParameters> PlanarRegionSegmentationParameters = topic("PlanarRegionSegmentationParameters");
+
    public static final Topic<DisplayType> SLAMOcTreeDisplayType = Root.child(UI).child(OcTree).topic(Display);
    
    public static final Topic<String> SLAMStatus = Root.child(Module).topic(Status);
@@ -76,7 +83,11 @@ public class SLAMModuleAPI
    public static final Topic<Integer> UISensorPoseHistoryFrames = Root.child(UI).child(SensorFrame).topic(Size);
    public static final Topic<StampedPosePacket> CustomizedFrameState = Root.child(UI).child(Custom).topic(Data);
    public static final Topic<Double> LatestFrameConfidenceFactor = Root.child(UI).child(SensorFrame).topic(Value);
-   
+
+   private static <T> Topic<T> topic(String name)
+   {
+      return Root.child(SLAM).topic(apiFactory.createTypedTopicTheme(name));
+   }
    
    public static final MessagerAPI API = apiFactory.getAPIAndCloseFactory();
 }
