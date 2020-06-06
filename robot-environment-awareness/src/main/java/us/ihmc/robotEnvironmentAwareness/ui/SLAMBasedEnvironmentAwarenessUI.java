@@ -19,6 +19,7 @@ import us.ihmc.robotEnvironmentAwareness.communication.REAUIMessager;
 import us.ihmc.robotEnvironmentAwareness.communication.SLAMModuleAPI;
 import us.ihmc.robotEnvironmentAwareness.slam.viewer.SLAMMeshViewer;
 import us.ihmc.robotEnvironmentAwareness.ui.controller.DataExporterAnchorPaneController;
+import us.ihmc.robotEnvironmentAwareness.ui.controller.NormalEstimationAnchorPaneController;
 import us.ihmc.robotEnvironmentAwareness.ui.controller.SLAMAnchorPaneController;
 import us.ihmc.robotEnvironmentAwareness.ui.io.PlanarRegionDataExporter;
 import us.ihmc.robotEnvironmentAwareness.ui.io.PlanarRegionSegmentationDataExporter;
@@ -40,6 +41,8 @@ public class SLAMBasedEnvironmentAwarenessUI
    private SLAMAnchorPaneController slamAnchorPaneController;
    @FXML
    private DataExporterAnchorPaneController dataExporterAnchorPaneController;
+   @FXML
+   private NormalEstimationAnchorPaneController normalEstimationController;
 
    private final Stage primaryStage;
 
@@ -120,6 +123,12 @@ public class SLAMBasedEnvironmentAwarenessUI
       slamAnchorPaneController.setConfigurationFile(configurationFile);
       slamAnchorPaneController.attachREAMessager(uiMessager);
       slamAnchorPaneController.bindControls();
+
+      normalEstimationController.setNormalEstimationParametersTopic(SLAMModuleAPI.NormalEstimationParameters);
+      normalEstimationController.setConfigurationFile(null);// TODO;
+      normalEstimationController.attachREAMessager(uiMessager);
+      normalEstimationController.bindControls();
+
       //      dataExporterAnchorPaneController.setConfigurationFile(configurationFile);
       //      dataExporterAnchorPaneController.attachREAMessager(uiMessager);
       //      dataExporterAnchorPaneController.setMainWindow(primaryStage);
