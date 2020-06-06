@@ -22,7 +22,6 @@ import us.ihmc.euclid.transform.interfaces.RigidBodyTransformReadOnly;
 import us.ihmc.euclid.tuple3D.Point3D;
 import us.ihmc.euclid.tuple3D.interfaces.Point3DReadOnly;
 import us.ihmc.jOctoMap.ocTree.NormalOcTree;
-import us.ihmc.log.LogTools;
 import us.ihmc.messager.Messager;
 import us.ihmc.messager.MessagerAPIFactory.Topic;
 import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
@@ -64,8 +63,6 @@ public class SLAMModule
    private ScheduledFuture<?> scheduledMain;
    private ScheduledFuture<?> scheduledSLAM;
 
-   private final AtomicReference<RandomICPSLAMParameters> ihmcSLAMParameters;
-
    private final IHMCROS2Publisher<PlanarRegionsListMessage> planarRegionPublisher;
 
    protected final Ros2Node ros2Node = ROS2Tools.createRos2Node(PubSubImplementation.FAST_RTPS, ROS2Tools.REA_NODE_NAME);
@@ -88,7 +85,10 @@ public class SLAMModule
       enable = reaMessager.createInput(SLAMModuleAPI.SLAMEnable, true);
       planarRegionsStateTopicToSubmit = SLAMModuleAPI.SLAMPlanarRegionsState;
 
-      ihmcSLAMParameters = reaMessager.createInput(SLAMModuleAPI.SLAMParameters, new RandomICPSLAMParameters());
+      reaMessager.registerTopicListener(SLAMModuleAPI.SLAMParameters, slam::updateIcpSlamParameters);
+      reaMessager.registerTopicListener(SLAMModuleAPI.ConcaveHullFactoryParameters, slam::setConcaveHullFactoryParameters);
+      reaMessager.registerTopicListener(SLAMModuleAPI.PolygonizerParameters, slam::setPolygonizerParameters);
+      reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionSegmentationParameters, slam::setPlanarRegionSegmentationParameters);
 
       reaMessager.registerTopicListener(SLAMModuleAPI.SLAMClear, (content) -> clearSLAM());
 
@@ -151,8 +151,6 @@ public class SLAMModule
 
       if (pointCloudQueue.size() == 0)
          return;
-
-      updateSLAMParameters();
 
       StereoVisionPointCloudMessage pointCloudToCompute = pointCloudQueue.getFirst();
       boolean stationaryFlag = stationaryFlagQueue.getFirst();
@@ -282,12 +280,6 @@ public class SLAMModule
          stationaryFlagQueue.add(robotStatus.get());
          reasonableVelocityFlagQueue.add(velocityStatus.get());
       }
-   }
-
-   private void updateSLAMParameters()
-   {
-      RandomICPSLAMParameters parameters = ihmcSLAMParameters.get();
-      slam.updateParameters(parameters);
    }
 
    public void clearSLAM()

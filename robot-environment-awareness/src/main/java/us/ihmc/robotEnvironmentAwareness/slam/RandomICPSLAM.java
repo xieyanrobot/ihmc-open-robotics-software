@@ -28,7 +28,7 @@ public class RandomICPSLAM extends SLAMBasics
    public static final boolean DEBUG = false;
    public Point3D[] correctedSourcePointsToWorld;
 
-   private final AtomicReference<RandomICPSLAMParameters> parameters = new AtomicReference<>(new RandomICPSLAMParameters());
+   private final AtomicReference<RandomICPSLAMParameters> icpSlamParameters = new AtomicReference<>(new RandomICPSLAMParameters());
 
    private final PlanarRegionSegmentationCalculator segmentationCalculator;
 
@@ -100,7 +100,7 @@ public class RandomICPSLAM extends SLAMBasics
       int numberOfPoints = getLatestFrame().getPointCloud().length;
 
       scanCollection.setSubSampleSize(numberOfPoints);
-      RandomICPSLAMParameters parameters = this.parameters.get();
+      RandomICPSLAMParameters parameters = this.icpSlamParameters.get();
       scanCollection.addScan(SLAMTools.toScan(pointCloud, sensorPose.getTranslation(), parameters.getMinimumDepth(), parameters.getMaximumDepth()));
 
       octree.insertScanCollection(scanCollection, false);
@@ -151,7 +151,7 @@ public class RandomICPSLAM extends SLAMBasics
    @Override
    public RigidBodyTransformReadOnly computeFrameCorrectionTransformer(SLAMFrame frame)
    {
-      RandomICPSLAMParameters parameters = this.parameters.get();
+      RandomICPSLAMParameters parameters = this.icpSlamParameters.get();
       Point3D[] sourcePointsToSensor = SLAMTools.createSourcePointsToSensorPose(frame,
                                                                                 octree,
                                                                                 parameters.getNumberOfSourcePoints(),
@@ -234,9 +234,9 @@ public class RandomICPSLAM extends SLAMBasics
       return sourcePointsToWorld;
    }
 
-   public void updateParameters(RandomICPSLAMParameters parameters)
+   public void updateIcpSlamParameters(RandomICPSLAMParameters parameters)
    {
-      this.parameters.set(parameters);
+      this.icpSlamParameters.set(parameters);
    }
 
    class RandomICPSLAMFrameOptimizerCostFunction implements SingleQueryFunction
@@ -288,7 +288,7 @@ public class RandomICPSLAM extends SLAMBasics
             newSourcePointToWorld.set(sourcePoint);
             newSensorPose.transform(newSourcePointToWorld);
 
-            int maximumICPSearchingSize = parameters.get().getMaximumICPSearchingSize();
+            int maximumICPSearchingSize = icpSlamParameters.get().getMaximumICPSearchingSize();
             double distance = SLAMTools.computeDistanceToNormalOctree(octree, newSourcePointToWorld, maximumICPSearchingSize);
 
             if (distance < 0)
