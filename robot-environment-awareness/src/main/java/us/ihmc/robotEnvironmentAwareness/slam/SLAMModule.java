@@ -89,6 +89,7 @@ public class SLAMModule
       reaMessager.registerTopicListener(SLAMModuleAPI.ConcaveHullFactoryParameters, slam::setConcaveHullFactoryParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.PolygonizerParameters, slam::setPolygonizerParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionSegmentationParameters, slam::setPlanarRegionSegmentationParameters);
+      reaMessager.registerTopicListener(SLAMModuleAPI.NormalEstimationParameters, slam::setNormalEstimationParameters);
 
       reaMessager.registerTopicListener(SLAMModuleAPI.SLAMClear, (content) -> clearSLAM());
 

@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import controller_msgs.msg.dds.StereoVisionPointCloudMessage;
 import us.ihmc.euclid.transform.interfaces.RigidBodyTransformReadOnly;
+import us.ihmc.jOctoMap.normalEstimation.NormalEstimationParameters;
 import us.ihmc.jOctoMap.ocTree.NormalOcTree;
 import us.ihmc.robotEnvironmentAwareness.geometry.ConcaveHullFactoryParameters;
 import us.ihmc.robotEnvironmentAwareness.planarRegion.CustomRegionMergeParameters;
@@ -30,6 +31,11 @@ public class SLAMBasics implements SLAMInterface
 
       planarRegionSegmentationParameters.setMaxDistanceFromPlane(0.03);
       planarRegionSegmentationParameters.setMinRegionSize(150);
+   }
+
+   public void setNormalEstimationParameters(NormalEstimationParameters normalEstimationParameters)
+   {
+      octree.setNormalEstimationParameters(normalEstimationParameters);
    }
 
    public void setPlanarRegionSegmentationParameters(PlanarRegionSegmentationParameters planarRegionSegmentationParameters)

@@ -3,6 +3,7 @@ package us.ihmc.robotEnvironmentAwareness.communication;
 import controller_msgs.msg.dds.PlanarRegionsListMessage;
 import controller_msgs.msg.dds.StampedPosePacket;
 import controller_msgs.msg.dds.StereoVisionPointCloudMessage;
+import us.ihmc.jOctoMap.normalEstimation.NormalEstimationParameters;
 import us.ihmc.messager.MessagerAPIFactory;
 import us.ihmc.messager.MessagerAPIFactory.Category;
 import us.ihmc.messager.MessagerAPIFactory.CategoryTheme;
@@ -70,6 +71,7 @@ public class SLAMModuleAPI
    public static final Topic<PolygonizerParameters> PolygonizerParameters = topic("PolygonizerParameters");
    public static final Topic<ConcaveHullFactoryParameters> ConcaveHullFactoryParameters = topic("ConcaveHullFactoryParameters");
    public static final Topic<PlanarRegionSegmentationParameters> PlanarRegionSegmentationParameters = topic("PlanarRegionSegmentationParameters");
+   public static final Topic<NormalEstimationParameters> NormalEstimationParameters = topic("NormalEstimationParameters");
 
    public static final Topic<DisplayType> SLAMOcTreeDisplayType = Root.child(UI).child(OcTree).topic(Display);
    
