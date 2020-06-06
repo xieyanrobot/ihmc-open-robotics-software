@@ -8,12 +8,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import controller_msgs.msg.dds.FootstepDataMessage;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import us.ihmc.euclid.tuple2D.Point2D;
 import us.ihmc.javaFXToolkit.shapes.JavaFXMultiColorMeshBuilder;
 import us.ihmc.javaFXToolkit.shapes.TextureColorPalette1D;
 import us.ihmc.javaFXVisualizers.FootstepMeshManager;
 import us.ihmc.messager.MessagerAPIFactory.Topic;
 import us.ihmc.robotEnvironmentAwareness.communication.REAUIMessager;
 import us.ihmc.robotEnvironmentAwareness.communication.SLAMModuleAPI;
+import us.ihmc.robotics.robotSide.SideDependentList;
 
 public class FootstepMeshViewer implements Runnable
 {
@@ -37,13 +39,11 @@ public class FootstepMeshViewer implements Runnable
       Topic<Boolean> showviz = SLAMModuleAPI.ShowFootstepDataViz;
       enable = uiMessager.createInput(showviz, true);
 
-      uiMessager.registerTopicListener(SLAMModuleAPI.ClearFootstepDataViz, clear ->
-      {
+      uiMessager.registerTopicListener(SLAMModuleAPI.ClearFootstepDataViz, clear -> {
          clear();
       });
 
-      uiMessager.registerTopicListener(SLAMModuleAPI.SLAMClear, clear ->
-      {
+      uiMessager.registerTopicListener(SLAMModuleAPI.SLAMClear, clear -> {
          clear();
       });
 
@@ -64,6 +64,15 @@ public class FootstepMeshViewer implements Runnable
       {
          footstepMesheManagers.get(i).computeMesh();
          footstepMesheManagers.get(i).updateMesh();
+      }
+   }
+
+   public void setDefaultContactPoints(SideDependentList<List<Point2D>> defaultContactPoints)
+   {
+      for (int i = 0; i < footstepMesheManagers.size(); i++)
+      {
+         footstepMesheManagers.get(i).setFoothold(defaultContactPoints);
+         footstepMesheManagers.get(i).setIgnorePartialFootHolds(true);
       }
    }
 
@@ -91,6 +100,7 @@ public class FootstepMeshViewer implements Runnable
       {
          footstepMesheManagers.get(i).clear();
       }
+      numberOfFootstepsToRender.set(0);
    }
 
    public Node getRoot()

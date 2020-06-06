@@ -1,12 +1,13 @@
 package us.ihmc.javaFXVisualizers;
 
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import javafx.scene.Group;
 import javafx.scene.paint.Material;
 import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Lightweight class for passing mesh data between threads

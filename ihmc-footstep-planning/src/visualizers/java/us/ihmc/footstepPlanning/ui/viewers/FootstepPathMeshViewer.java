@@ -1,12 +1,6 @@
 package us.ihmc.footstepPlanning.ui.viewers;
 
-import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.ComputePath;
-import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.FootstepPlanResponse;
-import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.FootstepToUpdateViz;
-import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.GlobalReset;
-import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.IgnorePartialFootholds;
-import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.SelectedFootstep;
-import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.ShowFootstepPlan;
+import static us.ihmc.footstepPlanning.communication.FootstepPlannerMessagerAPI.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +17,11 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import us.ihmc.commons.thread.ThreadTools;
-import us.ihmc.euclid.geometry.ConvexPolygon2D;
 import us.ihmc.euclid.tuple2D.Point2D;
 import us.ihmc.javaFXToolkit.shapes.JavaFXMultiColorMeshBuilder;
 import us.ihmc.javaFXToolkit.shapes.TextureColorAdaptivePalette;
 import us.ihmc.javaFXVisualizers.FootstepMeshManager;
 import us.ihmc.messager.Messager;
-import us.ihmc.robotics.robotSide.RobotSide;
 import us.ihmc.robotics.robotSide.SideDependentList;
 
 /**
@@ -40,7 +32,6 @@ public class FootstepPathMeshViewer extends AnimationTimer
 {
    private final Group root = new Group();
    private final ExecutorService executorService = Executors.newSingleThreadExecutor(ThreadTools.createNamedThreadFactory(getClass().getSimpleName()));
-   private SideDependentList<ConvexPolygon2D> defaultContactPoints = new SideDependentList<>();
 
    private final AtomicBoolean reset = new AtomicBoolean(false);
    private final AtomicBoolean ignorePartialFootholds = new AtomicBoolean();
@@ -59,14 +50,12 @@ public class FootstepPathMeshViewer extends AnimationTimer
    public FootstepPathMeshViewer(Messager messager)
    {
       // call these on separate thread since they update all meshes
-      messager.registerTopicListener(FootstepPlanResponse, footstepPlan ->
-      {
+      messager.registerTopicListener(FootstepPlanResponse, footstepPlan -> {
          footstepPlanResponse.set(footstepPlan);
          updateAllMeshes.set(true);
       });
 
-      messager.registerTopicListener(IgnorePartialFootholds, ignore ->
-      {
+      messager.registerTopicListener(IgnorePartialFootholds, ignore -> {
          ignorePartialFootholds.set(ignore);
          updateAllMeshes.set(true);
       });
@@ -173,16 +162,9 @@ public class FootstepPathMeshViewer extends AnimationTimer
 
    public void setDefaultContactPoints(SideDependentList<List<Point2D>> defaultContactPoints)
    {
-      for (RobotSide robotSide : RobotSide.values)
+      for (int i = 0; i < footstepMeshes.size(); i++)
       {
-         ConvexPolygon2D defaultFoothold = new ConvexPolygon2D();
-         for (int i = 0; i < defaultContactPoints.get(robotSide).size(); i++)
-         {
-            defaultFoothold.addVertex(defaultContactPoints.get(robotSide).get(i));
-         }
-
-         defaultFoothold.update();
-         this.defaultContactPoints.put(robotSide, defaultFoothold);
+         footstepMeshes.get(i).setFoothold(defaultContactPoints);
       }
    }
 

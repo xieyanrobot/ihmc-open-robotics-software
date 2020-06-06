@@ -54,6 +54,7 @@ public class AtlasSLAMModule extends SLAMModule
       FootstepStatusMessage footstepStatusMessage = subscriber.takeNextData();
       if (footstepStatusMessage.getFootstepStatus() == FootstepStatus.COMPLETED.toByte())
       {
+         reaMessager.submitMessage(SLAMModuleAPI.ShowFootstepDataViz, true);
          RobotSide robotSide = RobotSide.fromByte(footstepStatusMessage.getRobotSide());
          Point3DReadOnly footLocation = footstepStatusMessage.getActualFootPositionInWorld();
          QuaternionReadOnly footOrientation = footstepStatusMessage.getActualFootOrientationInWorld();

@@ -17,6 +17,7 @@ import javafx.scene.paint.Material;
 import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
 import javafx.util.Pair;
+import us.ihmc.euclid.tuple2D.Point2D;
 import us.ihmc.messager.MessagerAPIFactory.Topic;
 import us.ihmc.robotEnvironmentAwareness.communication.REAUIMessager;
 import us.ihmc.robotEnvironmentAwareness.communication.SLAMModuleAPI;
@@ -25,6 +26,8 @@ import us.ihmc.robotEnvironmentAwareness.tools.ExecutorServiceTools.ExceptionHan
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.OccupancyMapMeshBuilder;
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.PlanarRegionsMeshBuilder;
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.StereoVisionPointCloudViewer;
+import us.ihmc.robotics.robotSide.RobotSide;
+import us.ihmc.robotics.robotSide.SideDependentList;
 
 public class SLAMMeshViewer
 {
@@ -37,7 +40,7 @@ public class SLAMMeshViewer
    private final List<ScheduledFuture<?>> meshBuilderScheduledFutures = new ArrayList<>();
    private final MeshView planarRegionMeshView = new MeshView();
 
-   private ScheduledExecutorService executorService = ExecutorServiceTools.newScheduledThreadPool(4, getClass(), ExceptionHandling.CANCEL_AND_REPORT);
+   private ScheduledExecutorService executorService = ExecutorServiceTools.newScheduledThreadPool(5, getClass(), ExceptionHandling.CANCEL_AND_REPORT);
    private final AnimationTimer renderMeshAnimation;
 
    private final PlanarRegionsMeshBuilder planarRegionsMeshBuilder;
@@ -50,21 +53,27 @@ public class SLAMMeshViewer
 
    public SLAMMeshViewer(REAUIMessager uiMessager)
    {
-      planarRegionsMeshBuilder = new PlanarRegionsMeshBuilder(uiMessager,
-                                                              SLAMModuleAPI.SLAMPlanarRegionsState,
-                                                              SLAMModuleAPI.ShowPlanarRegionsMap,
-                                                              SLAMModuleAPI.SLAMVizClear,
-                                                              SLAMModuleAPI.SLAMClear,
-                                                              SLAMModuleAPI.RequestPlanarRegions);
+      planarRegionsMeshBuilder = new PlanarRegionsMeshBuilder(uiMessager, SLAMModuleAPI.SLAMPlanarRegionsState, SLAMModuleAPI.ShowPlanarRegionsMap,
+                                                              SLAMModuleAPI.SLAMVizClear, SLAMModuleAPI.SLAMClear, SLAMModuleAPI.RequestPlanarRegions);
 
       occupancyMapViewer = new OccupancyMapMeshBuilder(uiMessager);
 
-      latestBufferViewer = new StereoVisionPointCloudViewer(SLAMModuleAPI.IhmcSLAMFrameState,
-                                                            uiMessager,
-                                                            SLAMModuleAPI.ShowLatestFrame,
+      latestBufferViewer = new StereoVisionPointCloudViewer(SLAMModuleAPI.IhmcSLAMFrameState, uiMessager, SLAMModuleAPI.ShowLatestFrame,
                                                             SLAMModuleAPI.SLAMVizClear);
 
       footstepMeshViewer = new FootstepMeshViewer(uiMessager);
+      
+      SideDependentList<List<Point2D>> defaultContactPoints = new SideDependentList<>();
+      List<Point2D> dummyPoints = new ArrayList<>();
+      dummyPoints.add(new Point2D(0.15, 0.05));
+      dummyPoints.add(new Point2D(-0.15, 0.05));
+      dummyPoints.add(new Point2D(-0.15, -0.05));
+      dummyPoints.add(new Point2D(0.15, -0.05));
+      for (RobotSide side : RobotSide.values)
+      {
+         defaultContactPoints.put(side, dummyPoints);
+      }
+      footstepMeshViewer.setDefaultContactPoints(defaultContactPoints);
 
       occupancyMapViewer.getRoot().setMouseTransparent(true);
       latestBufferViewer.getRoot().setMouseTransparent(true);
@@ -89,8 +98,7 @@ public class SLAMMeshViewer
          }
       };
 
-      uiMessager.registerModuleMessagerStateListener(isMessagerOpen ->
-      {
+      uiMessager.registerModuleMessagerStateListener(isMessagerOpen -> {
          if (isMessagerOpen)
             start();
          else
