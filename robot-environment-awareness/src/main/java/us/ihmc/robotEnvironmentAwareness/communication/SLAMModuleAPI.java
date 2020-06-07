@@ -15,6 +15,7 @@ import us.ihmc.robotEnvironmentAwareness.communication.packets.NormalOcTreeMessa
 import us.ihmc.robotEnvironmentAwareness.geometry.ConcaveHullFactoryParameters;
 import us.ihmc.robotEnvironmentAwareness.planarRegion.PlanarRegionSegmentationParameters;
 import us.ihmc.robotEnvironmentAwareness.planarRegion.PolygonizerParameters;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.SurfaceNormalFilterParameters;
 import us.ihmc.robotEnvironmentAwareness.slam.RandomICPSLAMParameters;
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.OcTreeMeshBuilder.DisplayType;
 
@@ -71,6 +72,10 @@ public class SLAMModuleAPI
    public static final Topic<PolygonizerParameters> PolygonizerParameters = topic("PolygonizerParameters");
    public static final Topic<ConcaveHullFactoryParameters> ConcaveHullFactoryParameters = topic("ConcaveHullFactoryParameters");
    public static final Topic<PlanarRegionSegmentationParameters> PlanarRegionSegmentationParameters = topic("PlanarRegionSegmentationParameters");
+   public static final Topic<SurfaceNormalFilterParameters> SurfaceNormalFilterParameters = topic("SurfaceNormalFilterParameters");
+
+   public static final Topic<Boolean> NormalEstimationEnable = topic("NormalEstimationEnable");
+   public static final Topic<Boolean> NormalEstimationClear = topic("NormalEstimationClear");
    public static final Topic<NormalEstimationParameters> NormalEstimationParameters = topic("NormalEstimationParameters");
 
    public static final Topic<DisplayType> SLAMOcTreeDisplayType = Root.child(UI).child(OcTree).topic(Display);

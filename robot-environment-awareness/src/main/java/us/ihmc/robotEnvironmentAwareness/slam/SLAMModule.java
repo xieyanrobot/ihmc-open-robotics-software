@@ -21,6 +21,7 @@ import us.ihmc.euclid.transform.RigidBodyTransform;
 import us.ihmc.euclid.transform.interfaces.RigidBodyTransformReadOnly;
 import us.ihmc.euclid.tuple3D.Point3D;
 import us.ihmc.euclid.tuple3D.interfaces.Point3DReadOnly;
+import us.ihmc.jOctoMap.normalEstimation.NormalEstimationParameters;
 import us.ihmc.jOctoMap.ocTree.NormalOcTree;
 import us.ihmc.messager.Messager;
 import us.ihmc.messager.MessagerAPIFactory.Topic;
@@ -32,6 +33,9 @@ import us.ihmc.robotEnvironmentAwareness.communication.SLAMModuleAPI;
 import us.ihmc.robotEnvironmentAwareness.communication.converters.OcTreeMessageConverter;
 import us.ihmc.robotEnvironmentAwareness.communication.converters.PointCloudCompression;
 import us.ihmc.robotEnvironmentAwareness.communication.packets.NormalOcTreeMessage;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.PlanarRegionSegmentationParameters;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.PolygonizerParameters;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.SurfaceNormalFilterParameters;
 import us.ihmc.robotEnvironmentAwareness.tools.ExecutorServiceTools;
 import us.ihmc.robotEnvironmentAwareness.tools.ExecutorServiceTools.ExceptionHandling;
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.StereoVisionPointCloudViewer;
@@ -90,6 +94,28 @@ public class SLAMModule
       reaMessager.registerTopicListener(SLAMModuleAPI.PolygonizerParameters, slam::setPolygonizerParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionSegmentationParameters, slam::setPlanarRegionSegmentationParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.NormalEstimationParameters, slam::setNormalEstimationParameters);
+      reaMessager.registerTopicListener(SLAMModuleAPI.SurfaceNormalFilterParameters, slam::setSurfaceNormalFilterParameters);
+
+      // Set up the custom parameters
+      NormalEstimationParameters normalEstimationParameters = new NormalEstimationParameters();
+      normalEstimationParameters.setNumberOfIterations(7);
+
+      PlanarRegionSegmentationParameters planarRegionSegmentationParameters = new PlanarRegionSegmentationParameters();
+      planarRegionSegmentationParameters.setMaxDistanceFromPlane(0.03);
+      planarRegionSegmentationParameters.setMinRegionSize(150);
+
+      PolygonizerParameters polygonizerParameters = new PolygonizerParameters();
+      polygonizerParameters.setConcaveHullThreshold(0.15);
+
+      SurfaceNormalFilterParameters surfaceNormalFilterParameters = new SurfaceNormalFilterParameters();
+      surfaceNormalFilterParameters.setUseSurfaceNormalFilter(true);
+      surfaceNormalFilterParameters.setSurfaceNormalLowerBound(Math.toRadians(-40.0));
+      surfaceNormalFilterParameters.setSurfaceNormalUpperBound(Math.toRadians(40.0));
+
+      reaMessager.submitMessage(SLAMModuleAPI.NormalEstimationParameters, normalEstimationParameters);
+      reaMessager.submitMessage(SLAMModuleAPI.PlanarRegionSegmentationParameters, planarRegionSegmentationParameters);
+      reaMessager.submitMessage(SLAMModuleAPI.PolygonizerParameters, polygonizerParameters);
+      reaMessager.submitMessage(SLAMModuleAPI.SurfaceNormalFilterParameters, surfaceNormalFilterParameters);
 
       reaMessager.registerTopicListener(SLAMModuleAPI.SLAMClear, (content) -> clearSLAM());
 
@@ -194,6 +220,7 @@ public class SLAMModule
       if (success)
       {
          NormalOcTree octreeMap = slam.getOctree();
+         // TODO this seems super computationally expensive.
          NormalOcTreeMessage octreeMessage = OcTreeMessageConverter.convertToMessage(octreeMap);
          reaMessager.submitMessage(SLAMModuleAPI.SLAMOctreeMapState, octreeMessage);
 
