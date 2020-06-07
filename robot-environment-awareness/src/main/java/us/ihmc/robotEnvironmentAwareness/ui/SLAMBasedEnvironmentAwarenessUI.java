@@ -43,6 +43,8 @@ public class SLAMBasedEnvironmentAwarenessUI
    private NormalEstimationAnchorPaneController normalEstimationAnchorPaneController;
    @FXML
    private RegionSegmentationAnchorPaneController regionSegmentationAnchorPaneController;
+   @FXML
+   private PolygonizerAnchorPaneController polygonizerAnchorPaneController;
 
    private final Stage primaryStage;
 
@@ -136,6 +138,16 @@ public class SLAMBasedEnvironmentAwarenessUI
       regionSegmentationAnchorPaneController.setPlanarRegionSegmentationParametersTopic(SLAMModuleAPI.PlanarRegionSegmentationParameters);
       regionSegmentationAnchorPaneController.setConfigurationFile(configurationFile);
       regionSegmentationAnchorPaneController.attachREAMessager(uiMessager);
+      regionSegmentationAnchorPaneController.bindControls();
+
+      polygonizerAnchorPaneController.setUiPlanarRegionHideNodesTopic(null);
+      polygonizerAnchorPaneController.setPlanarRegionsPolygonizerEnableTopic(SLAMModuleAPI.PlanarRegionsPolygonizerEnable);
+      polygonizerAnchorPaneController.setPlanarRegionsPolygonizerClearTopic(SLAMModuleAPI.PlanarRegionsPolygonizerClear);
+      polygonizerAnchorPaneController.setPlanarRegionsPolygonizerParametersTopic(SLAMModuleAPI.PolygonizerParameters);
+      polygonizerAnchorPaneController.setPlanarRegionsConcaveHullParametersTopic(SLAMModuleAPI.ConcaveHullFactoryParameters);
+      polygonizerAnchorPaneController.setConfigurationFile(configurationFile);
+      polygonizerAnchorPaneController.attachREAMessager(uiMessager);
+      polygonizerAnchorPaneController.bindControls();
 
       dataExporterAnchorPaneController.setConfigurationFile(configurationFile);
       dataExporterAnchorPaneController.attachREAMessager(uiMessager);

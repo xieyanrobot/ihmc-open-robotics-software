@@ -40,6 +40,9 @@ public class RandomICPSLAM extends SLAMBasics
    private final AtomicBoolean enableSegmentation = new AtomicBoolean(true);
    private final PlanarRegionSegmentationCalculator segmentationCalculator = new PlanarRegionSegmentationCalculator();
 
+   private final AtomicBoolean enablePlanarRegionsPolygonizer = new AtomicBoolean(true);
+   private final AtomicBoolean clearPlanarRegionsPolygonizer = new AtomicBoolean(false);
+
    private final GradientDescentModule optimizer;
    private static final double OPTIMIZER_POSITION_LIMIT = 0.1;
    private static final double OPTIMIZER_ANGLE_LIMIT = Math.toRadians(10.);
@@ -134,6 +137,7 @@ public class RandomICPSLAM extends SLAMBasics
 
    public boolean updateNormals()
    {
+      // TODO updating the normals is expensive
       if (!enableNormalEstimation.get())
          return false;
 
@@ -161,15 +165,21 @@ public class RandomICPSLAM extends SLAMBasics
          return;
       }
 
-      // TODO updating the normals is expensive
-      segmentationCalculator.setBoundingBox(octree.getBoundingBox());
       segmentationCalculator.setSurfaceNormalFilterParameters(surfaceNormalFilterParameters.get());
       segmentationCalculator.setParameters(planarRegionSegmentationParameters.get());
       segmentationCalculator.setSensorPosition(getLatestFrame().getSensorPose().getTranslation());
       segmentationCalculator.compute(octree.getRoot());
 
       List<PlanarRegionSegmentationRawData> rawData = segmentationCalculator.getSegmentationRawData();
-      planarRegionsMap = PlanarRegionPolygonizer.createPlanarRegionsList(rawData, concaveHullFactoryParameters.get(), polygonizerParameters.get());
+
+      if (clearPlanarRegionsPolygonizer.getAndSet(false))
+      {
+         planarRegionsMap = null;
+      }
+      else if (enablePlanarRegionsPolygonizer.get())
+      {
+         planarRegionsMap = PlanarRegionPolygonizer.createPlanarRegionsList(rawData, concaveHullFactoryParameters.get(), polygonizerParameters.get());
+      }
    }
 
    @Override
@@ -291,6 +301,16 @@ public class RandomICPSLAM extends SLAMBasics
    public void setSurfaceNormalFilterParameters(SurfaceNormalFilterParameters surfaceNormalFilterParameters)
    {
       this.surfaceNormalFilterParameters.set(surfaceNormalFilterParameters);
+   }
+
+   public void setEnablePlanarRegionsPolygonizer(boolean planarRegionsPolygonizerEnable)
+   {
+      this.enablePlanarRegionsPolygonizer.set(planarRegionsPolygonizerEnable);
+   }
+
+   public void setClearPlanarRegionsPolygonizer(boolean planarRegionsPolygonizerClear)
+   {
+      this.clearPlanarRegionsPolygonizer.set(planarRegionsPolygonizerClear);
    }
 
    public void setPolygonizerParameters(PolygonizerParameters polygonizerParameters)

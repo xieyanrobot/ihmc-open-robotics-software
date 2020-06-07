@@ -91,9 +91,16 @@ public class SLAMModule
       planarRegionsStateTopicToSubmit = SLAMModuleAPI.SLAMPlanarRegionsState;
 
       reaMessager.registerTopicListener(SLAMModuleAPI.SLAMParameters, slam::updateIcpSlamParameters);
-      reaMessager.registerTopicListener(SLAMModuleAPI.ConcaveHullFactoryParameters, slam::setConcaveHullFactoryParameters);
-      reaMessager.registerTopicListener(SLAMModuleAPI.PolygonizerParameters, slam::setPolygonizerParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.SurfaceNormalFilterParameters, slam::setSurfaceNormalFilterParameters);
+
+      reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionsPolygonizerClear, clear ->
+      {
+         slam.setClearPlanarRegionsPolygonizer(clear);
+         reaMessager.submitMessage(SLAMModuleAPI.PlanarRegionsPolygonizerClear, false);
+      });
+      reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionsPolygonizerEnable, slam::setEnablePlanarRegionsPolygonizer);
+      reaMessager.registerTopicListener(SLAMModuleAPI.PolygonizerParameters, slam::setPolygonizerParameters);
+      reaMessager.registerTopicListener(SLAMModuleAPI.ConcaveHullFactoryParameters, slam::setConcaveHullFactoryParameters);
 
       reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionsSegmentationClear, clear ->
       {

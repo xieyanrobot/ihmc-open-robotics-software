@@ -13,6 +13,7 @@ import us.ihmc.messager.MessagerAPIFactory.TopicTheme;
 import us.ihmc.messager.MessagerAPIFactory.TypedTopicTheme;
 import us.ihmc.robotEnvironmentAwareness.communication.packets.NormalOcTreeMessage;
 import us.ihmc.robotEnvironmentAwareness.geometry.ConcaveHullFactoryParameters;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.IntersectionEstimationParameters;
 import us.ihmc.robotEnvironmentAwareness.planarRegion.PlanarRegionSegmentationParameters;
 import us.ihmc.robotEnvironmentAwareness.planarRegion.PolygonizerParameters;
 import us.ihmc.robotEnvironmentAwareness.planarRegion.SurfaceNormalFilterParameters;
@@ -69,9 +70,13 @@ public class SLAMModuleAPI
    
    public static final Topic<PlanarRegionsListMessage> SLAMPlanarRegionsState = Root.child(Module).child(PlanarRegions).topic(Data);
    public static final Topic<RandomICPSLAMParameters> SLAMParameters = Root.child(Module).topic(Parameters);
+
+   public static final Topic<SurfaceNormalFilterParameters> SurfaceNormalFilterParameters = topic("SurfaceNormalFilterParameters");
+
+   public static final Topic<Boolean> PlanarRegionsPolygonizerEnable = topic("PlanarRegionsPolygonizerEnable");
+   public static final Topic<Boolean> PlanarRegionsPolygonizerClear = topic("PlanarRegionsPolygonizerClear");
    public static final Topic<PolygonizerParameters> PolygonizerParameters = topic("PolygonizerParameters");
    public static final Topic<ConcaveHullFactoryParameters> ConcaveHullFactoryParameters = topic("ConcaveHullFactoryParameters");
-   public static final Topic<SurfaceNormalFilterParameters> SurfaceNormalFilterParameters = topic("SurfaceNormalFilterParameters");
 
    public static final Topic<Boolean> PlanarRegionsSegmentationEnable = topic("PlanarRegionsSegmentationEnable");
    public static final Topic<Boolean> PlanarRegionsSegmentationClear = topic("PlanarRegionsSegmentationClear");
