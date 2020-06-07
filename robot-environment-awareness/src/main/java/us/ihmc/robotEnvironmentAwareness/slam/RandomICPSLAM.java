@@ -30,12 +30,14 @@ public class RandomICPSLAM extends SLAMBasics
    private final AtomicReference<RandomICPSLAMParameters> icpSlamParameters = new AtomicReference<>(new RandomICPSLAMParameters());
    private final AtomicReference<PolygonizerParameters> polygonizerParameters = new AtomicReference<>(new PolygonizerParameters());
    private final AtomicReference<ConcaveHullFactoryParameters> concaveHullFactoryParameters = new AtomicReference<>(new ConcaveHullFactoryParameters());
-   private final AtomicReference<SurfaceNormalFilterParameters> surfaceNormalFilterParameters = new AtomicReference<>(new SurfaceNormalFilterParameters());
    private final AtomicReference<PlanarRegionSegmentationParameters> planarRegionSegmentationParameters = new AtomicReference<>(new PlanarRegionSegmentationParameters());
 
    private final AtomicBoolean enableNormalEstimation = new AtomicBoolean(true);
    private final AtomicBoolean clearNormals = new AtomicBoolean(false);
+   private final AtomicReference<SurfaceNormalFilterParameters> surfaceNormalFilterParameters = new AtomicReference<>(new SurfaceNormalFilterParameters());
 
+   private final AtomicBoolean clearSegmentation = new AtomicBoolean(false);
+   private final AtomicBoolean enableSegmentation = new AtomicBoolean(true);
    private final PlanarRegionSegmentationCalculator segmentationCalculator = new PlanarRegionSegmentationCalculator();
 
    private final GradientDescentModule optimizer;
@@ -97,14 +99,7 @@ public class RandomICPSLAM extends SLAMBasics
       RandomICPSLAMParameters parameters = this.icpSlamParameters.get();
       scanCollection.addScan(SLAMTools.toScan(pointCloud, sensorPose.getTranslation(), parameters.getMinimumDepth(), parameters.getMaximumDepth()));
 
-      if (!enableNormalEstimation.get())
-         return;
 
-      if (clearNormals.getAndSet(false))
-      {
-         octree.clearNormals();
-         return;
-      }
 
       octree.insertScanCollection(scanCollection, false);
 
@@ -137,9 +132,37 @@ public class RandomICPSLAM extends SLAMBasics
       return success;
    }
 
+   public boolean updateNormals()
+   {
+      if (!enableNormalEstimation.get())
+         return false;
+
+      if (clearNormals.getAndSet(false))
+      {
+         octree.clearNormals();
+         return false;
+      }
+
+      octree.updateNormals();
+      return true;
+   }
+
    public void updatePlanarRegionsMap()
    {
-      octree.updateNormals();
+      if (clearSegmentation.getAndSet(false))
+      {
+         segmentationCalculator.clear();
+         return;
+      }
+
+      if (!enableSegmentation.get())
+      {
+         segmentationCalculator.removeDeadNodes();
+         return;
+      }
+
+      // TODO updating the normals is expensive
+      segmentationCalculator.setBoundingBox(octree.getBoundingBox());
       segmentationCalculator.setSurfaceNormalFilterParameters(surfaceNormalFilterParameters.get());
       segmentationCalculator.setParameters(planarRegionSegmentationParameters.get());
       segmentationCalculator.setSensorPosition(getLatestFrame().getSensorPose().getTranslation());
@@ -240,9 +263,29 @@ public class RandomICPSLAM extends SLAMBasics
       this.icpSlamParameters.set(parameters);
    }
 
+   public void setClearPlanarRegionsSegmentation(boolean clearPlanarRegionsSegmentation)
+   {
+      this.clearSegmentation.set(clearPlanarRegionsSegmentation);
+   }
+
+   public void setEnablePlanarRegionsSegmentation(boolean enablePlanarRegionsSegmentation)
+   {
+      this.enableSegmentation.set(enablePlanarRegionsSegmentation);
+   }
+
    public void setPlanarRegionSegmentationParameters(PlanarRegionSegmentationParameters planarRegionSegmentationParameters)
    {
       this.planarRegionSegmentationParameters.set(planarRegionSegmentationParameters);
+   }
+
+   public void setClearNormals(boolean clearNormals)
+   {
+      this.clearNormals.set(clearNormals);
+   }
+
+   public void setEnableNormalEstimation(boolean enableNormalEstimation)
+   {
+      this.enableNormalEstimation.set(enableNormalEstimation);
    }
 
    public void setSurfaceNormalFilterParameters(SurfaceNormalFilterParameters surfaceNormalFilterParameters)
