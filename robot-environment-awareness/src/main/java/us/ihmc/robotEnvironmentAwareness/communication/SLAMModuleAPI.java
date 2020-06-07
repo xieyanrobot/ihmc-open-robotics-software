@@ -71,8 +71,11 @@ public class SLAMModuleAPI
    public static final Topic<RandomICPSLAMParameters> SLAMParameters = Root.child(Module).topic(Parameters);
    public static final Topic<PolygonizerParameters> PolygonizerParameters = topic("PolygonizerParameters");
    public static final Topic<ConcaveHullFactoryParameters> ConcaveHullFactoryParameters = topic("ConcaveHullFactoryParameters");
-   public static final Topic<PlanarRegionSegmentationParameters> PlanarRegionSegmentationParameters = topic("PlanarRegionSegmentationParameters");
    public static final Topic<SurfaceNormalFilterParameters> SurfaceNormalFilterParameters = topic("SurfaceNormalFilterParameters");
+
+   public static final Topic<Boolean> PlanarRegionsSegmentationEnable = topic("PlanarRegionsSegmentationEnable");
+   public static final Topic<Boolean> PlanarRegionsSegmentationClear = topic("PlanarRegionsSegmentationClear");
+   public static final Topic<PlanarRegionSegmentationParameters> PlanarRegionSegmentationParameters = topic("PlanarRegionSegmentationParameters");
 
    public static final Topic<Boolean> NormalEstimationEnable = topic("NormalEstimationEnable");
    public static final Topic<Boolean> NormalEstimationClear = topic("NormalEstimationClear");

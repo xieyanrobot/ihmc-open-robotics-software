@@ -407,7 +407,9 @@ public class RandomICPSLAMTest
          System.out.println();
          System.out.println(" ## add frame " + i);
          slam.addFrame(messages.get(i));
-         slam.updatePlanarRegionsMap();
+
+         if (slam.updateNormals())
+            slam.updatePlanarRegionsMap();
 
          originalViewer.addStereoMessage(messages.get(i), Color.GREEN);
 

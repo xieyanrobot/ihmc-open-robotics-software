@@ -15,9 +15,7 @@ import us.ihmc.robotEnvironmentAwareness.communication.REACommunicationPropertie
 import us.ihmc.robotEnvironmentAwareness.communication.REAUIMessager;
 import us.ihmc.robotEnvironmentAwareness.communication.SLAMModuleAPI;
 import us.ihmc.robotEnvironmentAwareness.slam.viewer.SLAMMeshViewer;
-import us.ihmc.robotEnvironmentAwareness.ui.controller.DataExporterAnchorPaneController;
-import us.ihmc.robotEnvironmentAwareness.ui.controller.NormalEstimationAnchorPaneController;
-import us.ihmc.robotEnvironmentAwareness.ui.controller.SLAMAnchorPaneController;
+import us.ihmc.robotEnvironmentAwareness.ui.controller.*;
 import us.ihmc.robotEnvironmentAwareness.ui.io.PlanarRegionDataExporter;
 import us.ihmc.robotEnvironmentAwareness.ui.io.PlanarRegionSegmentationDataExporter;
 import us.ihmc.robotEnvironmentAwareness.ui.io.StereoVisionPointCloudDataExporter;
@@ -43,6 +41,8 @@ public class SLAMBasedEnvironmentAwarenessUI
    private DataExporterAnchorPaneController dataExporterAnchorPaneController;
    @FXML
    private NormalEstimationAnchorPaneController normalEstimationAnchorPaneController;
+   @FXML
+   private RegionSegmentationAnchorPaneController regionSegmentationAnchorPaneController;
 
    private final Stage primaryStage;
 
@@ -130,6 +130,12 @@ public class SLAMBasedEnvironmentAwarenessUI
       normalEstimationAnchorPaneController.setConfigurationFile(configurationFile);
       normalEstimationAnchorPaneController.attachREAMessager(uiMessager);
       normalEstimationAnchorPaneController.bindControls();
+
+      regionSegmentationAnchorPaneController.setPlanarRegionsSegmentationEnableTopic(SLAMModuleAPI.PlanarRegionsSegmentationEnable);
+      regionSegmentationAnchorPaneController.setPlanarRegionsSegmentationClearTopic(SLAMModuleAPI.PlanarRegionsSegmentationClear);
+      regionSegmentationAnchorPaneController.setPlanarRegionSegmentationParametersTopic(SLAMModuleAPI.PlanarRegionSegmentationParameters);
+      regionSegmentationAnchorPaneController.setConfigurationFile(configurationFile);
+      regionSegmentationAnchorPaneController.attachREAMessager(uiMessager);
 
       dataExporterAnchorPaneController.setConfigurationFile(configurationFile);
       dataExporterAnchorPaneController.attachREAMessager(uiMessager);

@@ -38,6 +38,7 @@ import us.ihmc.robotEnvironmentAwareness.planarRegion.PolygonizerParameters;
 import us.ihmc.robotEnvironmentAwareness.planarRegion.SurfaceNormalFilterParameters;
 import us.ihmc.robotEnvironmentAwareness.tools.ExecutorServiceTools;
 import us.ihmc.robotEnvironmentAwareness.tools.ExecutorServiceTools.ExceptionHandling;
+import us.ihmc.robotEnvironmentAwareness.ui.controller.SLAMAnchorPaneController;
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.StereoVisionPointCloudViewer;
 import us.ihmc.robotics.geometry.PlanarRegionsList;
 import us.ihmc.ros2.Ros2Node;
@@ -92,9 +93,23 @@ public class SLAMModule
       reaMessager.registerTopicListener(SLAMModuleAPI.SLAMParameters, slam::updateIcpSlamParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.ConcaveHullFactoryParameters, slam::setConcaveHullFactoryParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.PolygonizerParameters, slam::setPolygonizerParameters);
-      reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionSegmentationParameters, slam::setPlanarRegionSegmentationParameters);
-      reaMessager.registerTopicListener(SLAMModuleAPI.NormalEstimationParameters, slam::setNormalEstimationParameters);
       reaMessager.registerTopicListener(SLAMModuleAPI.SurfaceNormalFilterParameters, slam::setSurfaceNormalFilterParameters);
+
+      reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionsSegmentationClear, clear ->
+      {
+         slam.setClearPlanarRegionsSegmentation(clear);
+         reaMessager.submitMessage(SLAMModuleAPI.PlanarRegionsSegmentationClear, false);
+      });
+      reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionsSegmentationEnable, slam::setEnablePlanarRegionsSegmentation);
+      reaMessager.registerTopicListener(SLAMModuleAPI.PlanarRegionSegmentationParameters, slam::setPlanarRegionSegmentationParameters);
+
+      reaMessager.registerTopicListener(SLAMModuleAPI.NormalEstimationClear, clear ->
+      {
+         slam.setClearNormals(clear);
+         reaMessager.submitMessage(SLAMModuleAPI.NormalEstimationClear, false);
+      });
+      reaMessager.registerTopicListener(SLAMModuleAPI.NormalEstimationEnable, slam::setEnableNormalEstimation);
+      reaMessager.registerTopicListener(SLAMModuleAPI.NormalEstimationParameters, slam::setNormalEstimationParameters);
 
       // Set up the custom parameters
       NormalEstimationParameters normalEstimationParameters = new NormalEstimationParameters();
@@ -224,7 +239,9 @@ public class SLAMModule
          NormalOcTreeMessage octreeMessage = OcTreeMessageConverter.convertToMessage(octreeMap);
          reaMessager.submitMessage(SLAMModuleAPI.SLAMOctreeMapState, octreeMessage);
 
-         slam.updatePlanarRegionsMap();
+         if (slam.updateNormals())
+            slam.updatePlanarRegionsMap();
+
          PlanarRegionsList planarRegionsMap = slam.getPlanarRegionsMap();
          PlanarRegionsListMessage planarRegionsListMessage = PlanarRegionMessageConverter.convertToPlanarRegionsListMessage(planarRegionsMap);
          reaMessager.submitMessage(planarRegionsStateTopicToSubmit, planarRegionsListMessage);
