@@ -1,8 +1,5 @@
 package us.ihmc.robotEnvironmentAwareness.ui;
 
-import java.io.File;
-import java.io.IOException;
-
 import controller_msgs.msg.dds.StampedPosePacket;
 import controller_msgs.msg.dds.StereoVisionPointCloudMessage;
 import javafx.fxml.FXML;
@@ -26,6 +23,9 @@ import us.ihmc.robotEnvironmentAwareness.ui.io.PlanarRegionSegmentationDataExpor
 import us.ihmc.robotEnvironmentAwareness.ui.io.StereoVisionPointCloudDataExporter;
 import us.ihmc.robotEnvironmentAwareness.ui.viewer.SensorFrameViewer;
 
+import java.io.File;
+import java.io.IOException;
+
 public class SLAMBasedEnvironmentAwarenessUI
 {
    private static final String UI_CONFIGURATION_FILE_NAME = "./Configurations/defaultREAUIConfiguration.txt";
@@ -42,7 +42,7 @@ public class SLAMBasedEnvironmentAwarenessUI
    @FXML
    private DataExporterAnchorPaneController dataExporterAnchorPaneController;
    @FXML
-   private NormalEstimationAnchorPaneController normalEstimationController;
+   private NormalEstimationAnchorPaneController normalEstimationAnchorPaneController;
 
    private final Stage primaryStage;
 
@@ -124,15 +124,17 @@ public class SLAMBasedEnvironmentAwarenessUI
       slamAnchorPaneController.attachREAMessager(uiMessager);
       slamAnchorPaneController.bindControls();
 
-      normalEstimationController.setNormalEstimationParametersTopic(SLAMModuleAPI.NormalEstimationParameters);
-      normalEstimationController.setConfigurationFile(null);// TODO;
-      normalEstimationController.attachREAMessager(uiMessager);
-      normalEstimationController.bindControls();
+      normalEstimationAnchorPaneController.setNormalEstimationClearTopic(SLAMModuleAPI.NormalEstimationClear);
+      normalEstimationAnchorPaneController.setNormalEstimationEnableTopic(SLAMModuleAPI.NormalEstimationEnable);
+      normalEstimationAnchorPaneController.setNormalEstimationParametersTopic(SLAMModuleAPI.NormalEstimationParameters);
+      normalEstimationAnchorPaneController.setConfigurationFile(configurationFile);
+      normalEstimationAnchorPaneController.attachREAMessager(uiMessager);
+      normalEstimationAnchorPaneController.bindControls();
 
-      //      dataExporterAnchorPaneController.setConfigurationFile(configurationFile);
-      //      dataExporterAnchorPaneController.attachREAMessager(uiMessager);
-      //      dataExporterAnchorPaneController.setMainWindow(primaryStage);
-      //      dataExporterAnchorPaneController.bindControls();
+      dataExporterAnchorPaneController.setConfigurationFile(configurationFile);
+      dataExporterAnchorPaneController.attachREAMessager(uiMessager);
+      dataExporterAnchorPaneController.setMainWindow(primaryStage);
+      dataExporterAnchorPaneController.bindControls();
    }
 
    public void show() throws IOException

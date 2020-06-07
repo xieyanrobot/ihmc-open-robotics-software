@@ -1,6 +1,7 @@
 package us.ihmc.robotEnvironmentAwareness.slam;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.util.concurrent.AtomicDouble;
@@ -13,10 +14,8 @@ import us.ihmc.euclid.tuple3D.Point3D;
 import us.ihmc.euclid.tuple3D.interfaces.Point3DReadOnly;
 import us.ihmc.jOctoMap.normalEstimation.NormalEstimationParameters;
 import us.ihmc.jOctoMap.pointCloud.ScanCollection;
-import us.ihmc.robotEnvironmentAwareness.planarRegion.PlanarRegionPolygonizer;
-import us.ihmc.robotEnvironmentAwareness.planarRegion.PlanarRegionSegmentationCalculator;
-import us.ihmc.robotEnvironmentAwareness.planarRegion.PlanarRegionSegmentationRawData;
-import us.ihmc.robotEnvironmentAwareness.planarRegion.SurfaceNormalFilterParameters;
+import us.ihmc.robotEnvironmentAwareness.geometry.ConcaveHullFactoryParameters;
+import us.ihmc.robotEnvironmentAwareness.planarRegion.*;
 import us.ihmc.robotEnvironmentAwareness.slam.tools.SLAMTools;
 import us.ihmc.robotEnvironmentAwareness.updaters.AdaptiveRayMissProbabilityUpdater;
 import us.ihmc.robotics.numericalMethods.GradientDescentModule;
@@ -29,8 +28,15 @@ public class RandomICPSLAM extends SLAMBasics
    public Point3D[] correctedSourcePointsToWorld;
 
    private final AtomicReference<RandomICPSLAMParameters> icpSlamParameters = new AtomicReference<>(new RandomICPSLAMParameters());
+   private final AtomicReference<PolygonizerParameters> polygonizerParameters = new AtomicReference<>(new PolygonizerParameters());
+   private final AtomicReference<ConcaveHullFactoryParameters> concaveHullFactoryParameters = new AtomicReference<>(new ConcaveHullFactoryParameters());
+   private final AtomicReference<SurfaceNormalFilterParameters> surfaceNormalFilterParameters = new AtomicReference<>(new SurfaceNormalFilterParameters());
+   private final AtomicReference<PlanarRegionSegmentationParameters> planarRegionSegmentationParameters = new AtomicReference<>(new PlanarRegionSegmentationParameters());
 
-   private final PlanarRegionSegmentationCalculator segmentationCalculator;
+   private final AtomicBoolean enableNormalEstimation = new AtomicBoolean(true);
+   private final AtomicBoolean clearNormals = new AtomicBoolean(false);
+
+   private final PlanarRegionSegmentationCalculator segmentationCalculator = new PlanarRegionSegmentationCalculator();
 
    private final GradientDescentModule optimizer;
    private static final double OPTIMIZER_POSITION_LIMIT = 0.1;
@@ -65,18 +71,6 @@ public class RandomICPSLAM extends SLAMBasics
    {
       super(octreeResolution);
 
-      segmentationCalculator = new PlanarRegionSegmentationCalculator();
-
-      SurfaceNormalFilterParameters surfaceNormalFilterParameters = new SurfaceNormalFilterParameters();
-      surfaceNormalFilterParameters.setUseSurfaceNormalFilter(true);
-      surfaceNormalFilterParameters.setSurfaceNormalLowerBound(Math.toRadians(-40.0));
-      surfaceNormalFilterParameters.setSurfaceNormalUpperBound(Math.toRadians(40.0));
-
-      segmentationCalculator.setParameters(planarRegionSegmentationParameters);
-      segmentationCalculator.setSurfaceNormalFilterParameters(surfaceNormalFilterParameters);
-
-      polygonizerParameters.setConcaveHullThreshold(0.15);
-
       optimizer = new GradientDescentModule(null, INITIAL_INPUT);
       int maxIterations = 300;
       double convergenceThreshold = 1 * 10E-5;
@@ -103,15 +97,20 @@ public class RandomICPSLAM extends SLAMBasics
       RandomICPSLAMParameters parameters = this.icpSlamParameters.get();
       scanCollection.addScan(SLAMTools.toScan(pointCloud, sensorPose.getTranslation(), parameters.getMinimumDepth(), parameters.getMaximumDepth()));
 
+      if (!enableNormalEstimation.get())
+         return;
+
+      if (clearNormals.getAndSet(false))
+      {
+         octree.clearNormals();
+         return;
+      }
+
       octree.insertScanCollection(scanCollection, false);
 
       octree.enableParallelComputationForNormals(true);
       octree.enableParallelInsertionOfMisses(true);
       octree.setCustomRayMissProbabilityUpdater(new AdaptiveRayMissProbabilityUpdater());
-
-      NormalEstimationParameters normalEstimationParameters = new NormalEstimationParameters();
-      normalEstimationParameters.setNumberOfIterations(7);
-      octree.setNormalEstimationParameters(normalEstimationParameters);
    }
 
    @Override
@@ -141,11 +140,13 @@ public class RandomICPSLAM extends SLAMBasics
    public void updatePlanarRegionsMap()
    {
       octree.updateNormals();
+      segmentationCalculator.setSurfaceNormalFilterParameters(surfaceNormalFilterParameters.get());
+      segmentationCalculator.setParameters(planarRegionSegmentationParameters.get());
       segmentationCalculator.setSensorPosition(getLatestFrame().getSensorPose().getTranslation());
       segmentationCalculator.compute(octree.getRoot());
 
       List<PlanarRegionSegmentationRawData> rawData = segmentationCalculator.getSegmentationRawData();
-      planarRegionsMap = PlanarRegionPolygonizer.createPlanarRegionsList(rawData, concaveHullFactoryParameters, polygonizerParameters);
+      planarRegionsMap = PlanarRegionPolygonizer.createPlanarRegionsList(rawData, concaveHullFactoryParameters.get(), polygonizerParameters.get());
    }
 
    @Override
@@ -237,6 +238,26 @@ public class RandomICPSLAM extends SLAMBasics
    public void updateIcpSlamParameters(RandomICPSLAMParameters parameters)
    {
       this.icpSlamParameters.set(parameters);
+   }
+
+   public void setPlanarRegionSegmentationParameters(PlanarRegionSegmentationParameters planarRegionSegmentationParameters)
+   {
+      this.planarRegionSegmentationParameters.set(planarRegionSegmentationParameters);
+   }
+
+   public void setSurfaceNormalFilterParameters(SurfaceNormalFilterParameters surfaceNormalFilterParameters)
+   {
+      this.surfaceNormalFilterParameters.set(surfaceNormalFilterParameters);
+   }
+
+   public void setPolygonizerParameters(PolygonizerParameters polygonizerParameters)
+   {
+      this.polygonizerParameters.set(polygonizerParameters);
+   }
+
+   public void setConcaveHullFactoryParameters(ConcaveHullFactoryParameters concaveHullFactoryParameters)
+   {
+      this.concaveHullFactoryParameters.set(concaveHullFactoryParameters);
    }
 
    class RandomICPSLAMFrameOptimizerCostFunction implements SingleQueryFunction

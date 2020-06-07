@@ -92,6 +92,9 @@ public class SLAMViewer
 
    public void addPlanarRegions(PlanarRegionsList planarRegions)
    {
+      if (planarRegions == null)
+         return;
+
       PlanarRegionsGraphic planarRegionsGraphic = new PlanarRegionsGraphic();
       planarRegionsGraphic.generateMeshes(planarRegions);
       planarRegionsGraphic.update();

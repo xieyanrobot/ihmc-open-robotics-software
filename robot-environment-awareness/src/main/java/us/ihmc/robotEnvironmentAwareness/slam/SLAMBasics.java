@@ -21,36 +21,15 @@ public class SLAMBasics implements SLAMInterface
    private final List<RigidBodyTransformReadOnly> sensorPoses = new ArrayList<>();
 
    protected PlanarRegionsList planarRegionsMap;
-   protected final ConcaveHullFactoryParameters concaveHullFactoryParameters = new ConcaveHullFactoryParameters();
-   protected final PolygonizerParameters polygonizerParameters = new PolygonizerParameters();
-   protected final PlanarRegionSegmentationParameters planarRegionSegmentationParameters = new PlanarRegionSegmentationParameters();
 
    public SLAMBasics(double octreeResolution)
    {
       octree = new NormalOcTree(octreeResolution);
-
-      planarRegionSegmentationParameters.setMaxDistanceFromPlane(0.03);
-      planarRegionSegmentationParameters.setMinRegionSize(150);
    }
 
    public void setNormalEstimationParameters(NormalEstimationParameters normalEstimationParameters)
    {
       octree.setNormalEstimationParameters(normalEstimationParameters);
-   }
-
-   public void setPlanarRegionSegmentationParameters(PlanarRegionSegmentationParameters planarRegionSegmentationParameters)
-   {
-      this.planarRegionSegmentationParameters.set(planarRegionSegmentationParameters);
-   }
-
-   public void setPolygonizerParameters(PolygonizerParameters polygonizerParameters)
-   {
-      this.polygonizerParameters.set(polygonizerParameters);
-   }
-
-   public void setConcaveHullFactoryParameters(ConcaveHullFactoryParameters concaveHullFactoryParameters)
-   {
-      this.concaveHullFactoryParameters.set(concaveHullFactoryParameters);
    }
 
    @Override
