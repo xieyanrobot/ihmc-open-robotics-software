@@ -107,11 +107,6 @@ public class RandomICPSLAM extends SLAMBasics
       octree.clearNormals();
    }
 
-   public void updateOcTree()
-   {
-      octree.updateNormals();
-   }
-
    public void setNormalEstimationParameters(NormalEstimationParameters normalEstimationParameters)
    {
       octree.setNormalEstimationParameters(normalEstimationParameters);
@@ -139,6 +134,11 @@ public class RandomICPSLAM extends SLAMBasics
       }
 
       return success;
+   }
+
+   public void computeOcTreeNormals()
+   {
+      octree.updateNormals();
    }
 
    @Override

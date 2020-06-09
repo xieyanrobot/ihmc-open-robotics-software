@@ -14,7 +14,6 @@ import controller_msgs.msg.dds.StereoVisionPointCloudMessage;
 import javafx.scene.paint.Color;
 import us.ihmc.communication.ROS2Tools;
 import us.ihmc.communication.util.NetworkPorts;
-import us.ihmc.euclid.geometry.Pose3D;
 import us.ihmc.euclid.transform.RigidBodyTransform;
 import us.ihmc.euclid.transform.interfaces.RigidBodyTransformReadOnly;
 import us.ihmc.euclid.tuple3D.Point3D;
@@ -58,7 +57,6 @@ public class SLAMModule
    private final AtomicReference<NormalEstimationParameters> normalEstimationParameters;
    private final AtomicReference<Boolean> enableNormalEstimation;
    private final AtomicReference<Boolean> clearNormals;
-
    protected final RandomICPSLAM slam = new RandomICPSLAM(DEFAULT_OCTREE_RESOLUTION);
 
    private ScheduledExecutorService executorService = ExecutorServiceTools.newScheduledThreadPool(2, getClass(), ExceptionHandling.CATCH_AND_REPORT);
@@ -206,7 +204,7 @@ public class SLAMModule
       if (clearNormals.getAndSet(false))
          slam.clearNormals();
       if (enableNormalEstimation.get())
-         slam.updateOcTree();
+         slam.computeOcTreeNormals();
       dequeue();
 
       return success;
