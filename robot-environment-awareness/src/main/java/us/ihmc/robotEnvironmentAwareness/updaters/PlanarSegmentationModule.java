@@ -17,6 +17,7 @@ import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
 import us.ihmc.pubsub.subscriber.Subscriber;
 import us.ihmc.robotEnvironmentAwareness.communication.KryoMessager;
 import us.ihmc.robotEnvironmentAwareness.communication.REACommunicationProperties;
+import us.ihmc.robotEnvironmentAwareness.communication.REAModuleAPI;
 import us.ihmc.robotEnvironmentAwareness.communication.SegmentationModuleAPI;
 import us.ihmc.robotEnvironmentAwareness.communication.converters.OcTreeMessageConverter;
 import us.ihmc.robotEnvironmentAwareness.io.FilePropertyHelper;
@@ -66,6 +67,16 @@ public class PlanarSegmentationModule implements OcTreeConsumer
    private PlanarSegmentationModule(Messager reaMessager, File configurationFile) throws Exception
    {
       this(ROS2Tools.createRos2Node(PubSubImplementation.FAST_RTPS, ROS2Tools.REA_NODE_NAME),
+           REACommunicationProperties.inputTopic,
+           REACommunicationProperties.subscriberCustomRegionsTopicName,
+           ROS2Tools.REALSENSE_SLAM_MAP,
+           reaMessager,
+           configurationFile);
+   }
+
+   private PlanarSegmentationModule(Ros2Node ros2Node, Messager reaMessager, File configurationFile) throws Exception
+   {
+      this(ros2Node,
            REACommunicationProperties.inputTopic,
            REACommunicationProperties.subscriberCustomRegionsTopicName,
            ROS2Tools.REALSENSE_SLAM_MAP,
@@ -296,6 +307,32 @@ public class PlanarSegmentationModule implements OcTreeConsumer
                                                                     NetworkPorts.PLANAR_SEGMENTATION_UI_PORT,
                                                                     REACommunicationProperties.getPrivateNetClassList());
       moduleMessager.setAllowSelfSubmit(true);
+      File configurationFile = new File(configurationFilePath);
+      try
+      {
+         configurationFile.getParentFile().mkdirs();
+         configurationFile.createNewFile();
+      }
+      catch (IOException e)
+      {
+         System.out.println(configurationFile.getAbsolutePath());
+         e.printStackTrace();
+      }
+      return new PlanarSegmentationModule(inputTopic, customRegionTopic, outputTopic, moduleMessager, configurationFile);
+   }
+
+   public static PlanarSegmentationModule createIntraprocessModule(String configurationFilePath) throws Exception
+   {
+      Ros2Node ros2Node = ROS2Tools.createRos2Node(PubSubImplementation.FAST_RTPS, ROS2Tools.REA_NODE_NAME);
+      return createIntraprocessModule(configurationFilePath, ros2Node);
+   }
+
+   public static PlanarSegmentationModule createIntraprocessModule(String configurationFilePath, Ros2Node ros2Node) throws Exception
+   {
+      KryoMessager moduleMessager = KryoMessager.createIntraprocess(SegmentationModuleAPI.API,
+                                                                    NetworkPorts.PLANAR_SEGMENTATION_UI_PORT,
+                                                                    REACommunicationProperties.getPrivateNetClassList());
+      moduleMessager.setAllowSelfSubmit(true);
 
       File configurationFile = new File(configurationFilePath);
       try
@@ -309,6 +346,6 @@ public class PlanarSegmentationModule implements OcTreeConsumer
          e.printStackTrace();
       }
 
-      return new PlanarSegmentationModule(inputTopic, customRegionTopic, outputTopic, moduleMessager, configurationFile);
+      return new PlanarSegmentationModule(ros2Node, moduleMessager, configurationFile);
    }
 }
