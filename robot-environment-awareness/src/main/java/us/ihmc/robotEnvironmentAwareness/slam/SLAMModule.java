@@ -36,6 +36,7 @@ import us.ihmc.robotEnvironmentAwareness.io.FilePropertyHelper;
 import us.ihmc.robotEnvironmentAwareness.tools.ExecutorServiceTools;
 import us.ihmc.robotEnvironmentAwareness.tools.ExecutorServiceTools.ExceptionHandling;
 import us.ihmc.robotEnvironmentAwareness.ui.graphicsBuilders.StereoVisionPointCloudViewer;
+import us.ihmc.robotEnvironmentAwareness.updaters.ClosingListener;
 import us.ihmc.robotEnvironmentAwareness.updaters.OcTreeConsumer;
 import us.ihmc.ros2.Ros2Node;
 
@@ -69,6 +70,7 @@ public class SLAMModule
    protected final Ros2Node ros2Node;
 
    private final List<OcTreeConsumer> ocTreeConsumers = new ArrayList<>();
+   private final List<ClosingListener> closingListeners = new ArrayList<>();
 
    public SLAMModule(Messager messager)
    {
@@ -135,6 +137,11 @@ public class SLAMModule
       this.ocTreeConsumers.add(ocTreeConsumer);
    }
 
+   public void attachClosingListener(ClosingListener closingListener)
+   {
+      this.closingListeners.add(closingListener);
+   }
+
    public void removeOcTreeConsumer(OcTreeConsumer ocTreeConsumer)
    {
       this.ocTreeConsumers.remove(ocTreeConsumer);
@@ -157,6 +164,9 @@ public class SLAMModule
    public void stop()
    {
       LogTools.info("SLAM Module is going down");
+
+      for (ClosingListener closingListener : closingListeners)
+         closingListener.closing();
 
       try
       {
