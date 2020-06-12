@@ -25,9 +25,9 @@ import us.ihmc.wholeBodyController.DRCRobotJointMap;
 
 public class ValkyrieHighLevelControllerParameters implements HighLevelControllerParameters
 {
-   private final RobotTarget target;
-   private final ValkyrieJointMap jointMap;
-   private final ValkyrieStandPrepParameters standPrepParameters;
+   protected final RobotTarget target;
+   protected final ValkyrieJointMap jointMap;
+   protected final ValkyrieStandPrepParameters standPrepParameters;
 
    public ValkyrieHighLevelControllerParameters(RobotTarget target, ValkyrieJointMap jointMap)
    {
@@ -241,7 +241,7 @@ public class ValkyrieHighLevelControllerParameters implements HighLevelControlle
       return behaviors;
    }
 
-   private static void configureBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap, SpineJointName jointName,
+   protected static void configureBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap, SpineJointName jointName,
                                          JointDesiredControlMode controlMode, double stiffness, double damping)
    {
       JointDesiredBehavior jointBehavior = new JointDesiredBehavior(controlMode, stiffness, damping);
@@ -249,7 +249,7 @@ public class ValkyrieHighLevelControllerParameters implements HighLevelControlle
       behaviors.add(new GroupParameter<>(jointName.toString(), jointBehavior, names));
    }
 
-   private static void configureBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap, NeckJointName jointName,
+   protected static void configureBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap, NeckJointName jointName,
                                          JointDesiredControlMode controlMode, double stiffness, double damping)
    {
       JointDesiredBehavior jointBehavior = new JointDesiredBehavior(controlMode, stiffness, damping);
@@ -257,21 +257,21 @@ public class ValkyrieHighLevelControllerParameters implements HighLevelControlle
       behaviors.add(new GroupParameter<>(jointName.toString(), jointBehavior, names));
    }
 
-   private static void configureSymmetricBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap,
+   protected static void configureSymmetricBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap,
                                                   LegJointName jointName, JointDesiredControlMode controlMode, double stiffness, double damping)
    {
       JointDesiredBehavior jointBehavior = new JointDesiredBehavior(controlMode, stiffness, damping);
       behaviors.add(new GroupParameter<>(jointName.toString(), jointBehavior, getLeftAndRightJointNames(jointMap, jointName)));
    }
 
-   private static void configureSymmetricBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap,
+   protected static void configureSymmetricBehavior(List<GroupParameter<JointDesiredBehaviorReadOnly>> behaviors, DRCRobotJointMap jointMap,
                                                   ArmJointName jointName, JointDesiredControlMode controlMode, double stiffness, double damping)
    {
       JointDesiredBehavior jointBehavior = new JointDesiredBehavior(controlMode, stiffness, damping);
       behaviors.add(new GroupParameter<>(jointName.toString(), jointBehavior, getLeftAndRightJointNames(jointMap, jointName)));
    }
 
-   private static List<String> getLeftAndRightJointNames(DRCRobotJointMap jointMap, LegJointName legJointName)
+   protected static List<String> getLeftAndRightJointNames(DRCRobotJointMap jointMap, LegJointName legJointName)
    {
       List<String> jointNames = new ArrayList<>();
       for (RobotSide side : RobotSide.values)
@@ -281,7 +281,7 @@ public class ValkyrieHighLevelControllerParameters implements HighLevelControlle
       return jointNames;
    }
 
-   private static List<String> getLeftAndRightJointNames(DRCRobotJointMap jointMap, ArmJointName armJointName)
+   protected static List<String> getLeftAndRightJointNames(DRCRobotJointMap jointMap, ArmJointName armJointName)
    {
       List<String> jointNames = new ArrayList<>();
       for (RobotSide side : RobotSide.values)

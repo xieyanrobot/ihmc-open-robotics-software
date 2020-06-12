@@ -13,8 +13,7 @@ import us.ihmc.yoVariables.registry.YoVariableRegistry;
 public abstract class HighLevelControllerState implements State, JointLoadStatusProvider
 {
    protected final YoVariableRegistry registry;
-
-   private final JointSettingsHelper jointSettingsHelper;
+   protected final JointSettingsHelper jointSettingsHelper;
 
    private final HighLevelControllerName highLevelControllerName;
    protected final OneDoFJointBasics[] controlledJoints;
