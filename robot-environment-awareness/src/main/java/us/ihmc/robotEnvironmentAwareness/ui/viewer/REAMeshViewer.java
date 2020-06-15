@@ -70,7 +70,7 @@ public class REAMeshViewer
                                                                         REAModuleAPI.RequestDepthCloudBuffer, REAModuleAPI.DepthCloudBufferState,
                                                                         Color.DARKBLUE);
       ocTreeViewer = new OcTreeMeshBuilder(uiMessager, REAModuleAPI.OcTreeEnable, REAModuleAPI.OcTreeClear, REAModuleAPI.RequestOctree,
-                                           REAModuleAPI.RequestPlanarRegionsIntersections, REAModuleAPI.UIOcTreeDepth, REAModuleAPI.UIOcTreeColoringMode,
+                                           REAModuleAPI.RequestPlanarRegionSegmentation, REAModuleAPI.UIOcTreeDepth, REAModuleAPI.UIOcTreeColoringMode,
                                            REAModuleAPI.UIOcTreeDisplayType, REAModuleAPI.UIPlanarRegionHideNodes, REAModuleAPI.OcTreeState, REAModuleAPI.PlanarRegionsSegmentationState);
       planarRegionsMeshBuilder = new PlanarRegionsMeshBuilder(uiMessager, REAModuleAPI.PlanarRegionsState);
       intersectionsMeshBuilder = new PlanarRegionsIntersectionsMeshBuilder(uiMessager);
