@@ -542,6 +542,11 @@ public class RigidBodyControlManager
          requestedState.set(state);
    }
 
+   public RigidBodyControlState getState(RigidBodyControlMode controlMode)
+   {
+      return stateMachine.getState(controlMode);
+   }
+
    public RigidBodyControlMode getActiveControlMode()
    {
       return stateMachine.getCurrentStateKey();
