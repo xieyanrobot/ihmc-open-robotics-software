@@ -38,6 +38,6 @@ public class SimpleWalkingControllerStateFactory implements HighLevelControllerS
    @Override
    public HighLevelControllerName getStateEnum()
    {
-      return HighLevelControllerName.WALKING;
+      return HighLevelControllerName.SIMPLEWALKING;
    }
 }

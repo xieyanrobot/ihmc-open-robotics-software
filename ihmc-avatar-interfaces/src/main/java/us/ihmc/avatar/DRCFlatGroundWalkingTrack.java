@@ -2,6 +2,7 @@ package us.ihmc.avatar;
 
 import static us.ihmc.humanoidRobotics.communication.packets.dataobjects.HighLevelControllerName.DO_NOTHING_BEHAVIOR;
 import static us.ihmc.humanoidRobotics.communication.packets.dataobjects.HighLevelControllerName.WALKING;
+import static us.ihmc.humanoidRobotics.communication.packets.dataobjects.HighLevelControllerName.SIMPLEWALKING;
 
 import java.util.ArrayList;
 
@@ -182,13 +183,13 @@ public class DRCFlatGroundWalkingTrack
       controllerFactory.useDefaultDoNothingControlState();
       controllerFactory.useDefaultWalkingControlState();
 
-      controllerFactory.addRequestableTransition(DO_NOTHING_BEHAVIOR, WALKING);
-      controllerFactory.addRequestableTransition(WALKING, DO_NOTHING_BEHAVIOR);
+      controllerFactory.addRequestableTransition(DO_NOTHING_BEHAVIOR, SIMPLEWALKING);
+      controllerFactory.addRequestableTransition(SIMPLEWALKING, DO_NOTHING_BEHAVIOR);
 
       controllerFactory.addControllerFailureTransition(DO_NOTHING_BEHAVIOR, fallbackControllerState);
-      controllerFactory.addControllerFailureTransition(WALKING, fallbackControllerState);
+      controllerFactory.addControllerFailureTransition(SIMPLEWALKING, fallbackControllerState);
 
-      controllerFactory.setInitialState(HighLevelControllerName.WALKING);
+      controllerFactory.setInitialState(HighLevelControllerName.SIMPLEWALKING);
    }
 
    public void attachControllerFailureListener(ControllerFailureListener listener)
