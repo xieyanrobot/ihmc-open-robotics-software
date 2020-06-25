@@ -181,7 +181,7 @@ public class DRCFlatGroundWalkingTrack
                                     HighLevelControllerName fallbackControllerState)
    {
       controllerFactory.useDefaultDoNothingControlState();
-      controllerFactory.useDefaultWalkingControlState();
+      //controllerFactory.useDefaultWalkingControlState();
 
       controllerFactory.addRequestableTransition(DO_NOTHING_BEHAVIOR, SIMPLEWALKING);
       controllerFactory.addRequestableTransition(SIMPLEWALKING, DO_NOTHING_BEHAVIOR);

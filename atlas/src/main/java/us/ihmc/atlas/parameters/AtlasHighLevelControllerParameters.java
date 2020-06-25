@@ -49,6 +49,8 @@ public class AtlasHighLevelControllerParameters implements HighLevelControllerPa
       {
          case WALKING:
             return getDesiredJointBehaviorForWalking();
+         case SIMPLEWALKING:
+            return getDesiredJointBehaviorForWalking();
          case DO_NOTHING_BEHAVIOR:
          case FALLING_STATE:
             return getDesiredJointBehaviorForDoNothing();

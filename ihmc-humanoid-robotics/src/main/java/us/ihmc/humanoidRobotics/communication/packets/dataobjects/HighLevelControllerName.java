@@ -46,6 +46,7 @@ public enum HighLevelControllerName
       name.put(FREEZE_STATE, "FREEZE_STATE");
       name.put(STAND_TRANSITION_STATE, "STAND_TRANSITION_STATE");
       name.put(WALKING, "WALKING");
+      name.put(SIMPLEWALKING, "SIMPLEWALKING");
       name.put(EXIT_WALKING, "EXIT_WALKING");
       name.put(DIAGNOSTICS, "DIAGNOSTICS");
       name.put(CALIBRATION, "CALIBRATION");

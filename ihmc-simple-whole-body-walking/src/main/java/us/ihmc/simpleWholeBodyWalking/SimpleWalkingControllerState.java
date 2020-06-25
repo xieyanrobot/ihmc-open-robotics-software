@@ -37,7 +37,7 @@ import us.ihmc.yoVariables.variable.YoDouble;
 
 public class SimpleWalkingControllerState extends HighLevelControllerState
 {
-   private final static HighLevelControllerName controllerState = HighLevelControllerName.WALKING;
+   private final static HighLevelControllerName controllerState = HighLevelControllerName.SIMPLEWALKING;
    private final static FrameVector2D emptyVector = new FrameVector2D();
 
    private final WholeBodyControllerCore controllerCore;
