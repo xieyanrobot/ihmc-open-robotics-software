@@ -11,6 +11,7 @@ import us.ihmc.footstepPlanning.log.FootstepPlannerEdgeData;
 import us.ihmc.robotics.geometry.AngleTools;
 import us.ihmc.robotics.robotSide.SideDependentList;
 import us.ihmc.yoVariables.registry.YoVariableRegistry;
+import us.ihmc.yoVariables.variable.YoDouble;
 
 import java.util.function.ToDoubleFunction;
 import java.util.function.UnaryOperator;
@@ -27,6 +28,7 @@ public class FootstepCostCalculator
    private final RigidBodyTransform stanceNodeTransform = new RigidBodyTransform();
    private final RigidBodyTransform idealStepTransform = new RigidBodyTransform();
    private final RigidBodyTransform candidateNodeTransform = new RigidBodyTransform();
+   private final YoDouble edgeCost = new YoDouble("edgeCost", registry);
 
    public FootstepCostCalculator(FootstepPlannerParametersReadOnly parameters,
                                  FootstepNodeSnapperReadOnly snapper,
@@ -64,25 +66,25 @@ public class FootstepCostCalculator
       double pitchOffset = AngleTools.computeAngleDifferenceMinusPiToPi(candidateNodeTransform.getRotation().getPitch(), idealStepTransform.getRotation().getPitch());
       double rollOffset = AngleTools.computeAngleDifferenceMinusPiToPi(candidateNodeTransform.getRotation().getRoll(), idealStepTransform.getRotation().getRoll());
 
-      double cost = 0.0;
-      cost += Math.abs(xOffset * parameters.getForwardWeight());
-      cost += Math.abs(yOffset * parameters.getLateralWeight());
-      cost += Math.abs(zOffset * (zOffset > 0.0 ? parameters.getStepUpWeight() : parameters.getStepDownWeight()));
-      cost += Math.abs(yawOffset * parameters.getYawWeight());
-      cost += Math.abs(pitchOffset * parameters.getPitchWeight());
-      cost += Math.abs(rollOffset * parameters.getRollWeight());
+      edgeCost.set(0.0);
+      edgeCost.add(Math.abs(xOffset * parameters.getForwardWeight()));
+      edgeCost.add(Math.abs(yOffset * parameters.getLateralWeight()));
+      edgeCost.add(Math.abs(zOffset * (zOffset > 0.0 ? parameters.getStepUpWeight() : parameters.getStepDownWeight())));
+      edgeCost.add(Math.abs(yawOffset * parameters.getYawWeight()));
+      edgeCost.add(Math.abs(pitchOffset * parameters.getPitchWeight()));
+      edgeCost.add(Math.abs(rollOffset * parameters.getRollWeight()));
 
-      cost += computeAreaCost(candidateNode);
-      cost += parameters.getCostPerStep();
+      edgeCost.add(computeAreaCost(candidateNode));
+      edgeCost.add(parameters.getCostPerStep());
 
       // subtract off heuristic cost difference - i.e. ignore difference in goal proximity due to step adjustment
       double deltaHeuristics = heuristics.applyAsDouble(idealStep) - heuristics.applyAsDouble(candidateNode);
       if(deltaHeuristics > 0.0)
-         cost += deltaHeuristics;
+         edgeCost.add(deltaHeuristics);
       else
-         cost = Math.max(0.0, cost - deltaHeuristics);
+         edgeCost.set(Math.max(0.0, edgeCost.getValue() - deltaHeuristics));
 
-      return cost;
+      return edgeCost.getValue();
    }
 
    private double computeAreaCost(FootstepNode footstepNode)

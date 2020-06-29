@@ -17,6 +17,7 @@ import us.ihmc.footstepPlanning.log.FootstepPlannerEdgeData;
 import us.ihmc.pathPlanning.bodyPathPlanner.WaypointDefinedBodyPathPlanHolder;
 import us.ihmc.robotics.geometry.AngleTools;
 import us.ihmc.yoVariables.registry.YoVariableRegistry;
+import us.ihmc.yoVariables.variable.YoDouble;
 
 public class FootstepPlannerHeuristicCalculator
 {
@@ -27,6 +28,7 @@ public class FootstepPlannerHeuristicCalculator
    private final WaypointDefinedBodyPathPlanHolder bodyPathPlanHolder;
    private FootstepPlanHeading desiredHeading = FootstepPlanHeading.FORWARD;
 
+   private final YoDouble heuristicCost = new YoDouble("heuristicCost", registry);
    private final FramePose3D midFootPose = new FramePose3D();
    private final Point2D midFootPoint = new Point2D();
    private final Pose3D projectionPose = new Pose3D();
@@ -84,7 +86,7 @@ public class FootstepPlannerHeuristicCalculator
          finalTurnDistance = Math.abs(AngleTools.computeAngleDifferenceMinusPiToPi(pathHeading, goalPose.getYaw())) * 0.5 * Math.PI * parameters.getIdealFootstepWidth();
      }
 
-      double heuristicCost = parameters.getAStarHeuristicsWeight().getValue() * (initialTurnDistance + walkDistance + finalTurnDistance);
-      return heuristicCost;
+      heuristicCost.set(parameters.getAStarHeuristicsWeight().getValue() * (initialTurnDistance + walkDistance + finalTurnDistance));
+      return heuristicCost.getValue();
    }
 }
