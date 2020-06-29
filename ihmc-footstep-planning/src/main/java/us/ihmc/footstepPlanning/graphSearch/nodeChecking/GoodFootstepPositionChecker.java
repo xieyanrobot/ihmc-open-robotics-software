@@ -16,14 +16,16 @@ import us.ihmc.robotics.geometry.AngleTools;
 import us.ihmc.robotics.referenceFrames.TransformReferenceFrame;
 import us.ihmc.robotics.referenceFrames.ZUpFrame;
 import us.ihmc.robotics.robotSide.RobotSide;
+import us.ihmc.yoVariables.registry.YoVariableRegistry;
 
 import java.util.function.UnaryOperator;
 
 public class GoodFootstepPositionChecker
 {
+   private final YoVariableRegistry registry = new YoVariableRegistry(getClass().getSimpleName());
+
    private final FootstepPlannerParametersReadOnly parameters;
    private final FootstepNodeSnapAndWiggler snapper;
-   private final FootstepPlannerEdgeData edgeData;
 
    private final TransformReferenceFrame startOfSwingFrame = new TransformReferenceFrame("startOfSwingFrame", ReferenceFrame.getWorldFrame());
    private final TransformReferenceFrame stanceFootFrame = new TransformReferenceFrame("stanceFootFrame", ReferenceFrame.getWorldFrame());
@@ -36,17 +38,17 @@ public class GoodFootstepPositionChecker
    private BipedalFootstepPlannerNodeRejectionReason rejectionReason;
    private UnaryOperator<FootstepNode> parentNodeSupplier;
 
-   // Variables to log
+   // Variables to log TODO convert to yo-vars
    private double stepWidth;
    private double stepLength;
    private double stepHeight;
    private double stepReachXY;
 
-   public GoodFootstepPositionChecker(FootstepPlannerParametersReadOnly parameters, FootstepNodeSnapAndWiggler snapper, FootstepPlannerEdgeData edgeData)
+   public GoodFootstepPositionChecker(FootstepPlannerParametersReadOnly parameters, FootstepNodeSnapAndWiggler snapper, YoVariableRegistry parentRegistry)
    {
       this.parameters = parameters;
       this.snapper = snapper;
-      this.edgeData = edgeData;
+      parentRegistry.addChild(registry);
    }
 
    public void setParentNodeSupplier(UnaryOperator<FootstepNode> parentNodeSupplier)
@@ -191,17 +193,6 @@ public class GoodFootstepPositionChecker
       }
 
       return true;
-   }
-
-   void logVariables()
-   {
-      if (edgeData != null)
-      {
-         edgeData.setStepWidth(stepWidth);
-         edgeData.setStepLength(stepLength);
-         edgeData.setStepHeight(stepHeight);
-         edgeData.setStepReach(stepReachXY);
-      }
    }
 
    void clearLoggedVariables()

@@ -1,30 +1,28 @@
 package us.ihmc.footstepPlanning.graphSearch;
 
-import us.ihmc.euclid.geometry.ConvexPolygon2D;
 import us.ihmc.euclid.geometry.interfaces.ConvexPolygon2DReadOnly;
 import us.ihmc.euclid.transform.RigidBodyTransform;
-import us.ihmc.footstepPlanning.graphSearch.footstepSnapping.FootstepNodeSnapData;
 import us.ihmc.footstepPlanning.graphSearch.footstepSnapping.FootstepNodeSnapDataReadOnly;
 import us.ihmc.footstepPlanning.graphSearch.footstepSnapping.FootstepNodeSnapperReadOnly;
 import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNode;
 import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNodeTools;
-import us.ihmc.footstepPlanning.graphSearch.nodeExpansion.IdealStepCalculator;
 import us.ihmc.footstepPlanning.graphSearch.parameters.FootstepPlannerParametersReadOnly;
 import us.ihmc.footstepPlanning.log.FootstepPlannerEdgeData;
 import us.ihmc.robotics.geometry.AngleTools;
 import us.ihmc.robotics.robotSide.SideDependentList;
+import us.ihmc.yoVariables.registry.YoVariableRegistry;
 
 import java.util.function.ToDoubleFunction;
 import java.util.function.UnaryOperator;
 
 public class FootstepCostCalculator
 {
+   private final YoVariableRegistry registry = new YoVariableRegistry(getClass().getSimpleName());
    private final FootstepPlannerParametersReadOnly parameters;
    private final FootstepNodeSnapperReadOnly snapper;
    private final UnaryOperator<FootstepNode> idealStepCalculator;
    private final ToDoubleFunction<FootstepNode> heuristics;
    private final SideDependentList<? extends ConvexPolygon2DReadOnly> footPolygons;
-   private final FootstepPlannerEdgeData edgeData;
 
    private final RigidBodyTransform stanceNodeTransform = new RigidBodyTransform();
    private final RigidBodyTransform idealStepTransform = new RigidBodyTransform();
@@ -35,14 +33,14 @@ public class FootstepCostCalculator
                                  UnaryOperator<FootstepNode> idealStepCalculator,
                                  ToDoubleFunction<FootstepNode> heuristics,
                                  SideDependentList<? extends ConvexPolygon2DReadOnly> footPolygons,
-                                 FootstepPlannerEdgeData edgeData)
+                                 YoVariableRegistry parentRegistry)
    {
       this.parameters = parameters;
       this.snapper = snapper;
       this.idealStepCalculator = idealStepCalculator;
       this.heuristics = heuristics;
       this.footPolygons = footPolygons;
-      this.edgeData = edgeData;
+      parentRegistry.addChild(registry);
    }
 
    public double computeCost(FootstepNode stanceNode, FootstepNode candidateNode)
@@ -83,9 +81,6 @@ public class FootstepCostCalculator
          cost += deltaHeuristics;
       else
          cost = Math.max(0.0, cost - deltaHeuristics);
-
-      if (edgeData != null)
-         edgeData.setEdgeCost(cost);
 
       return cost;
    }

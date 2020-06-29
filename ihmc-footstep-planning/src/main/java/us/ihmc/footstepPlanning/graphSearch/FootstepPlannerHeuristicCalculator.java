@@ -16,14 +16,15 @@ import us.ihmc.footstepPlanning.graphSearch.parameters.FootstepPlannerParameters
 import us.ihmc.footstepPlanning.log.FootstepPlannerEdgeData;
 import us.ihmc.pathPlanning.bodyPathPlanner.WaypointDefinedBodyPathPlanHolder;
 import us.ihmc.robotics.geometry.AngleTools;
+import us.ihmc.yoVariables.registry.YoVariableRegistry;
 
 public class FootstepPlannerHeuristicCalculator
 {
+   private final YoVariableRegistry registry = new YoVariableRegistry(getClass().getSimpleName());
    private final FootstepNodeSnapperReadOnly snapper;
 
    private final FootstepPlannerParametersReadOnly parameters;
    private final WaypointDefinedBodyPathPlanHolder bodyPathPlanHolder;
-   private final FootstepPlannerEdgeData edgeData;
    private FootstepPlanHeading desiredHeading = FootstepPlanHeading.FORWARD;
 
    private final FramePose3D midFootPose = new FramePose3D();
@@ -35,13 +36,13 @@ public class FootstepPlannerHeuristicCalculator
    public FootstepPlannerHeuristicCalculator(FootstepNodeSnapperReadOnly snapper,
                                              FootstepPlannerParametersReadOnly parameters,
                                              WaypointDefinedBodyPathPlanHolder bodyPathPlanHolder,
-                                             FootstepPlannerEdgeData edgeData)
+                                             YoVariableRegistry parentRegistry)
    {
       this.snapper = snapper;
 
       this.parameters = parameters;
       this.bodyPathPlanHolder = bodyPathPlanHolder;
-      this.edgeData = edgeData;
+      parentRegistry.addChild(registry);
    }
 
    public void initialize(FramePose3DReadOnly goalPose, FootstepPlanHeading desiredHeading)
@@ -84,11 +85,6 @@ public class FootstepPlannerHeuristicCalculator
      }
 
       double heuristicCost = parameters.getAStarHeuristicsWeight().getValue() * (initialTurnDistance + walkDistance + finalTurnDistance);
-      if (edgeData != null)
-      {
-         edgeData.setHeuristicCost(heuristicCost);
-      }
-
       return heuristicCost;
    }
 }

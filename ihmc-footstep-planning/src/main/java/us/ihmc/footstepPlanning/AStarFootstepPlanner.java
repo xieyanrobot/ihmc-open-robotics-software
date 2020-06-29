@@ -29,7 +29,10 @@ import us.ihmc.pathPlanning.graph.structure.GraphEdge;
 import us.ihmc.robotics.geometry.PlanarRegionsList;
 import us.ihmc.robotics.robotSide.RobotSide;
 import us.ihmc.robotics.robotSide.SideDependentList;
+import us.ihmc.yoVariables.registry.YoVariableRegistry;
+import us.ihmc.yoVariables.variable.YoVariable;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +43,8 @@ import java.util.function.Function;
 
 public class AStarFootstepPlanner
 {
+   private final YoVariableRegistry registry = new YoVariableRegistry(getClass().getSimpleName());
+
    private final AStarFootstepPlannerIterationConductor footstepPlanner;
    private final FootstepPlannerParametersBasics footstepPlannerParameters;
    private final FootstepNodeSnapAndWiggler snapper;
@@ -75,21 +80,23 @@ public class AStarFootstepPlanner
       this.footPolygons = footPolygons;
       this.snapper = new FootstepNodeSnapAndWiggler(footPolygons, footstepPlannerParameters);
 
-      this.checker = new FootstepNodeChecker(footstepPlannerParameters, footPolygons, snapper, edgeData);
+      this.checker = new FootstepNodeChecker(footstepPlannerParameters, footPolygons, snapper, registry);
       this.idealStepCalculator = new IdealStepCalculator(footstepPlannerParameters, checker::isNodeValid, bodyPathPlanHolder);
       this.expansion = new ParameterBasedNodeExpansion(footstepPlannerParameters, idealStepCalculator::computeIdealStep, footPolygons);
 
-      this.distanceAndYawHeuristics = new FootstepPlannerHeuristicCalculator(snapper, footstepPlannerParameters, bodyPathPlanHolder, edgeData);
-      FootstepCostCalculator stepCostCalculator = new FootstepCostCalculator(footstepPlannerParameters, snapper, idealStepCalculator::computeIdealStep, distanceAndYawHeuristics::compute, footPolygons, edgeData);
+      this.distanceAndYawHeuristics = new FootstepPlannerHeuristicCalculator(snapper, footstepPlannerParameters, bodyPathPlanHolder, registry);
+      FootstepCostCalculator stepCostCalculator = new FootstepCostCalculator(footstepPlannerParameters, snapper, idealStepCalculator::computeIdealStep, distanceAndYawHeuristics::compute, footPolygons, registry);
 
       this.footstepPlanner = new AStarFootstepPlannerIterationConductor(expansion, checker::isNodeValid, stepCostCalculator::computeCost, distanceAndYawHeuristics::compute);
-      checker.setParentNodeSupplier(node -> footstepPlanner.getGraph().getParentNode(node));
+      this.checker.setParentNodeSupplier(node -> footstepPlanner.getGraph().getParentNode(node));
+      this.completionChecker = new FootstepPlannerCompletionChecker(footstepPlannerParameters, footstepPlanner, distanceAndYawHeuristics);
+
+      List<YoVariable<?>> allVariables = registry.getAllVariables();
       footstepPlanner.getGraph().setGraphExpansionCallback(edge ->
                                                            {
                                                               edgeData.setCostFromStart(footstepPlanner.getGraph().getCostFromStart(edge.getEndNode()));
                                                               edgeDataMap.put(edge, edgeData.getCopyAndClear());
                                                            });
-      this.completionChecker = new FootstepPlannerCompletionChecker(footstepPlannerParameters, footstepPlanner, distanceAndYawHeuristics);
    }
 
    public void handleRequest(FootstepPlannerRequest request, FootstepPlannerOutput outputToPack)

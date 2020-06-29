@@ -13,16 +13,18 @@ import us.ihmc.footstepPlanning.graphSearch.parameters.FootstepPlannerParameters
 import us.ihmc.footstepPlanning.log.FootstepPlannerEdgeData;
 import us.ihmc.robotics.geometry.PlanarRegionsList;
 import us.ihmc.robotics.robotSide.SideDependentList;
+import us.ihmc.yoVariables.registry.YoVariableRegistry;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
 
 public class FootstepNodeChecker
 {
+   private final YoVariableRegistry registry = new YoVariableRegistry(getClass().getSimpleName());
+
    private final FootstepPlannerParametersReadOnly parameters;
    private final FootstepNodeSnapAndWiggler snapper;
    private final SideDependentList<ConvexPolygon2D> footPolygons;
-   private final FootstepPlannerEdgeData edgeData;
 
    private final PlanarRegionCliffAvoider cliffAvoider;
    private final ObstacleBetweenNodesChecker obstacleBetweenNodesChecker;
@@ -31,22 +33,22 @@ public class FootstepNodeChecker
 
    private PlanarRegionsList planarRegionsList = null;
 
-   // Variables to log
+   // Variables to log TODO convert to yo-vars
    private final FootstepNodeSnapData candidateNodeSnapData = FootstepNodeSnapData.identityData();
    private double footAreaPercentage;
    private int footstepIndex = -1;
 
    public FootstepNodeChecker(FootstepPlannerParametersReadOnly parameters,
-                              SideDependentList<ConvexPolygon2D> footPolygons, FootstepNodeSnapAndWiggler snapper, FootstepPlannerEdgeData edgeData)
+                              SideDependentList<ConvexPolygon2D> footPolygons, FootstepNodeSnapAndWiggler snapper, YoVariableRegistry parentRegistry)
    {
       this.parameters = parameters;
       this.snapper = snapper;
-      this.edgeData = edgeData;
       this.footPolygons = footPolygons;
       this.cliffAvoider = new PlanarRegionCliffAvoider(parameters, snapper, footPolygons);
       this.obstacleBetweenNodesChecker = new ObstacleBetweenNodesChecker(parameters, snapper);
       this.collisionDetector = new FootstepNodeBodyCollisionDetector(parameters);
-      this.goodPositionChecker = new GoodFootstepPositionChecker(parameters, snapper, edgeData);
+      this.goodPositionChecker = new GoodFootstepPositionChecker(parameters, snapper, registry);
+      parentRegistry.addChild(registry);
    }
 
    public boolean isNodeValid(FootstepNode candidateNode, FootstepNode stanceNode)
@@ -58,7 +60,6 @@ public class FootstepNodeChecker
 
       clearLoggedVariables();
       BipedalFootstepPlannerNodeRejectionReason rejectionReason = isNodeValidInternal(candidateNode, stanceNode);
-      logVariables(candidateNode, stanceNode, rejectionReason);
 
       return rejectionReason == null;
    }
@@ -188,20 +189,6 @@ public class FootstepNodeChecker
    public void setParentNodeSupplier(UnaryOperator<FootstepNode> parentNodeSupplier)
    {
       this.goodPositionChecker.setParentNodeSupplier(parentNodeSupplier);
-   }
-
-   private void logVariables(FootstepNode candidateNode, FootstepNode stanceNode, BipedalFootstepPlannerNodeRejectionReason rejectionReason)
-   {
-      if (edgeData != null)
-      {
-         edgeData.setStanceNode(stanceNode);
-         edgeData.setCandidateNode(candidateNode);
-         edgeData.setCandidateNodeSnapData(candidateNodeSnapData);
-         edgeData.setFootAreaPercentage(footAreaPercentage);
-         edgeData.setRejectionReason(rejectionReason);
-         edgeData.setStepIndex(footstepIndex);
-         goodPositionChecker.logVariables();
-      }
    }
 
    private void clearLoggedVariables()
