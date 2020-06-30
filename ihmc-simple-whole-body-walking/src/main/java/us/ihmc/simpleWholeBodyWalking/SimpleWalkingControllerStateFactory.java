@@ -13,7 +13,7 @@ public class SimpleWalkingControllerStateFactory implements HighLevelControllerS
    private ICPWithTimeFreezingPlannerParameters capturePointPlannerParameters;
    
    public SimpleWalkingControllerStateFactory(ICPWithTimeFreezingPlannerParameters capturePointPlannerParameters) {
-      this.capturePointPlannerParameters = capturePointPlannerParameters;
+      this.capturePointPlannerParameters = capturePointPlannerParameters; // Needed to pass ICPWithTimeFreezingPlannerParameters this way
    }
    
    @Override
