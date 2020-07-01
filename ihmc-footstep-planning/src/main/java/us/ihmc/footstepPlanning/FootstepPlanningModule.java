@@ -379,6 +379,11 @@ public class FootstepPlanningModule implements CloseableAndDisposable
       return aStarFootstepPlanner.getIterationData();
    }
 
+   public YoVariableRegistry getAStarPlannerRegistry()
+   {
+      return aStarFootstepPlanner.getRegistry();
+   }
+
    public AdaptiveSwingTrajectoryCalculator getAdaptiveSwingTrajectoryCalculator()
    {
       return postProcessHandler.getAdaptiveSwingTrajectoryCalculator();
