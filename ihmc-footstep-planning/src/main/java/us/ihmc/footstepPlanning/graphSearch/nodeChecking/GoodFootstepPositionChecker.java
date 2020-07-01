@@ -39,7 +39,7 @@ public class GoodFootstepPositionChecker
 
    private UnaryOperator<FootstepNode> parentNodeSupplier;
 
-   private final YoEnum<BipedalFootstepPlannerNodeRejectionReason> rejectionReason = YoEnum.create("rejectionReason", "", BipedalFootstepPlannerNodeRejectionReason.class, registry, true);
+   private BipedalFootstepPlannerNodeRejectionReason rejectionReason = null;
    private final YoDouble stepWidth = new YoDouble("stepWidth", registry);
    private final YoDouble stepLength = new YoDouble("stepLength", registry);
    private final YoDouble stepHeight = new YoDouble("stepHeight", registry);
@@ -81,22 +81,22 @@ public class GoodFootstepPositionChecker
 
       if (stepWidth.getValue() < parameters.getMinimumStepWidth())
       {
-         rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_NOT_WIDE_ENOUGH);
+         rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_NOT_WIDE_ENOUGH;
          return false;
       }
       else if (stepWidth.getValue() > parameters.getMaximumStepWidth())
       {
-         rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_WIDE);
+         rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_WIDE;
          return false;
       }
       else if (stepLength.getValue() < parameters.getMinimumStepLength())
       {
-         rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_NOT_LONG_ENOUGH);
+         rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_NOT_LONG_ENOUGH;
          return false;
       }
       else if (Math.abs(stepHeight.getValue()) > parameters.getMaximumStepZ())
       {
-         rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_HIGH_OR_LOW);
+         rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_HIGH_OR_LOW;
          return false;
       }
 
@@ -112,7 +112,7 @@ public class GoodFootstepPositionChecker
 
       if (stepIsPitchedBack && (stepTooLow || stepTooForward))
       {
-         rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_LOW_AND_FORWARD_WHEN_PITCHED);
+         rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_LOW_AND_FORWARD_WHEN_PITCHED;
          return false;
       }
 
@@ -121,13 +121,13 @@ public class GoodFootstepPositionChecker
       {
          if (stepLength.getValue() > parameters.getMaximumStepXWhenForwardAndDown())
          {
-            rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FORWARD_AND_DOWN);
+            rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FORWARD_AND_DOWN;
             return false;
          }
 
          if (stepWidth.getValue() > parameters.getMaximumStepYWhenForwardAndDown())
          {
-            rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_WIDE_AND_DOWN);
+            rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_WIDE_AND_DOWN;
             return false;
          }
 
@@ -136,7 +136,7 @@ public class GoodFootstepPositionChecker
 
       if (stepReachXY.getValue() > parameters.getMaximumStepReach())
       {
-         rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FAR);
+         rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FAR;
          return false;
       }
 
@@ -144,12 +144,12 @@ public class GoodFootstepPositionChecker
       {
          if (stepReachXY.getValue() > parameters.getMaximumStepReachWhenSteppingUp())
          {
-            rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FAR_AND_HIGH);
+            rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FAR_AND_HIGH;
             return false;
          }
          if (stepWidth.getValue() > parameters.getMaximumStepWidthWhenSteppingUp())
          {
-            rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_WIDE_AND_HIGH);
+            rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_WIDE_AND_HIGH;
             return false;
          }
 
@@ -166,7 +166,7 @@ public class GoodFootstepPositionChecker
       double yawDelta = AngleTools.computeAngleDifferenceMinusPiToPi(candidateNode.getYaw(), stanceNode.getYaw());
       if (!MathTools.intervalContains(stepSide.negateIfRightSide(yawDelta), minYaw, maxYaw))
       {
-         rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_YAWS_TOO_MUCH);
+         rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_YAWS_TOO_MUCH;
          return false;
       }
 
@@ -187,7 +187,7 @@ public class GoodFootstepPositionChecker
          {
             if (swingReach > alphaSoS * parameters.getMaximumStepReachWhenSteppingUp())
             {
-               rejectionReason.set(BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FAR_AND_HIGH);
+               rejectionReason = BipedalFootstepPlannerNodeRejectionReason.STEP_TOO_FAR_AND_HIGH;
                return false;
             }
          }
@@ -206,6 +206,6 @@ public class GoodFootstepPositionChecker
 
    public BipedalFootstepPlannerNodeRejectionReason getRejectionReason()
    {
-      return rejectionReason.getEnumValue();
+      return rejectionReason;
    }
 }

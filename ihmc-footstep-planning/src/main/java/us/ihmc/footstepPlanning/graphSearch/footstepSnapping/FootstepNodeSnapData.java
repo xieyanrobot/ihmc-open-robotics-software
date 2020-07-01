@@ -7,6 +7,7 @@ import us.ihmc.euclid.transform.interfaces.RigidBodyTransformReadOnly;
 import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNode;
 import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNodeTools;
 import us.ihmc.robotics.geometry.PlanarRegion;
+import us.ihmc.yoVariables.registry.YoVariableRegistry;
 
 public class FootstepNodeSnapData implements FootstepNodeSnapDataReadOnly
 {
