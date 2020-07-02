@@ -1,5 +1,6 @@
 package us.ihmc.footstepPlanning.graphSearch.nodeChecking;
 
+import javafx.scene.paint.Color;
 import us.ihmc.euclid.geometry.ConvexPolygon2D;
 import us.ihmc.euclid.transform.RigidBodyTransform;
 import us.ihmc.footstepPlanning.graphSearch.collision.BodyCollisionData;
@@ -10,6 +11,7 @@ import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNode;
 import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNodeTools;
 import us.ihmc.footstepPlanning.graphSearch.graph.visualization.BipedalFootstepPlannerNodeRejectionReason;
 import us.ihmc.footstepPlanning.graphSearch.parameters.FootstepPlannerParametersReadOnly;
+import us.ihmc.footstepPlanning.log.graphics.SphereGraphic;
 import us.ihmc.robotics.geometry.PlanarRegionsList;
 import us.ihmc.robotics.robotSide.SideDependentList;
 import us.ihmc.yoVariables.registry.YoVariableRegistry;
@@ -39,6 +41,7 @@ public class FootstepNodeChecker
    private final YoEnum<BipedalFootstepPlannerNodeRejectionReason> rejectionReason = new YoEnum<>("rejectionReason", "", registry, BipedalFootstepPlannerNodeRejectionReason.class, true);
    private final YoDouble footAreaPercentage = new YoDouble("footAreaPercentage", registry);
    private final YoInteger footstepIndex = new YoInteger("footstepIndex", registry);
+   private final SphereGraphic sphereGraphic = new SphereGraphic("testSphere", Color.color(0.5, .5, 0.5, 0.5), registry);
 
    public FootstepNodeChecker(FootstepPlannerParametersReadOnly parameters,
                               SideDependentList<ConvexPolygon2D> footPolygons, FootstepNodeSnapAndWiggler snapper, YoVariableRegistry parentRegistry)
@@ -62,6 +65,9 @@ public class FootstepNodeChecker
 
       clearLoggedVariables();
       doValidityCheck(candidateNode, stanceNode);
+      sphereGraphic.getCenter().set(candidateNode.getX(), candidateNode.getY(), 0.2);
+      sphereGraphic.getRadius().set(0.1);
+
       return rejectionReason.getValue() == null;
    }
 
