@@ -79,6 +79,11 @@ public class BehaviorPlanarRegionEnvironments extends PlannerTestEnvironments
 
    public static PlanarRegionsList createRoughUpAndDownStairsWithFlatTop()
    {
+      return createRoughUpAndDownStairsWithFlatTop(true);
+   }
+
+   public static PlanarRegionsList createRoughUpAndDownStairsWithFlatTop(boolean createGroundPlane)
+   {
       return generate((random, generator) -> {
          offsetGrid(generator, 1.0, -0.5, 0.0, () ->
          {
@@ -98,7 +103,7 @@ public class BehaviorPlanarRegionEnvironments extends PlannerTestEnvironments
                });
             });
          });
-      });
+      }, createGroundPlane);
    }
 
    public static PlanarRegionsList generateStartingBlockRegions(RigidBodyTransform startingPose)
@@ -165,12 +170,17 @@ public class BehaviorPlanarRegionEnvironments extends PlannerTestEnvironments
       return generator.getPlanarRegionsList();
    }
 
-   private static PlanarRegionsList generate(GenerationInterface generationInterface)
+   private static PlanarRegionsList generate(GenerationInterface generationInterface, boolean createGroundPlane)
    {
       Random random = new Random(8349829898174L);
       PlanarRegionsListGenerator generator = new PlanarRegionsListGenerator();
-      generator.setId(greenId);
-      generator.addRectangle(groundSize, groundSize); // ground TODO form around terrain with no overlap?
+
+      if (createGroundPlane)
+      {
+         generator.setId(greenId);
+         generator.addRectangle(groundSize, groundSize); // ground TODO form around terrain with no overlap?
+      }
+
       generationInterface.generate(random, generator);
       return generator.getPlanarRegionsList();
    }

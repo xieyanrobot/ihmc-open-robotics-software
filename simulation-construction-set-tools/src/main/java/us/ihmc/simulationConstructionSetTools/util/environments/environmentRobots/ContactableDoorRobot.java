@@ -51,7 +51,8 @@ public class ContactableDoorRobot extends Robot implements SelectableObject, Sel
    public static final double DEFAULT_HANDLE_HINGE_RADIUS = 0.01;
    public static final double DEFAULT_HANDLE_RADIUS = 0.02;
    public static final double DEFAULT_HANDLE_LENGTH = 0.12;
-      
+   public static final double DEFAULT_YAW_IN_WORLD = 0.0;
+
    private static final AppearanceDefinition defaultColor = YoAppearance.Gray();
    
    private double widthX;
@@ -86,11 +87,16 @@ public class ContactableDoorRobot extends Robot implements SelectableObject, Sel
    
    public ContactableDoorRobot(String name, Point3D positionInWorld)
    {
-      this(name, DEFAULT_DOOR_DIMENSIONS, DEFAULT_MASS, positionInWorld, DEFAULT_HANDLE_OFFSET, 
-            DEFAULT_HANDLE_RADIUS, DEFAULT_HANDLE_LENGTH, DEFAULT_HANDLE_DOOR_SEPARATION, DEFAULT_HANDLE_HINGE_RADIUS);
+      this(name, positionInWorld, DEFAULT_YAW_IN_WORLD);
    }
-   
-   public ContactableDoorRobot(String name, Vector3D boxDimensions, double mass, Point3D positionInWorld, Vector2D handleOffset, 
+
+   public ContactableDoorRobot(String name, Point3D positionInWorld, double yawInWorld)
+   {
+      this(name, DEFAULT_DOOR_DIMENSIONS, DEFAULT_MASS, positionInWorld, yawInWorld, DEFAULT_HANDLE_OFFSET,
+           DEFAULT_HANDLE_RADIUS, DEFAULT_HANDLE_LENGTH, DEFAULT_HANDLE_DOOR_SEPARATION, DEFAULT_HANDLE_HINGE_RADIUS);
+   }
+
+   public ContactableDoorRobot(String name, Vector3D boxDimensions, double mass, Point3D positionInWorld, double yawInWorld, Vector2D handleOffset,
          double handleRadius, double handleLength, double handleDoorSeparation, double handleHingeRadius)
    {
       super(name);
@@ -109,15 +115,15 @@ public class ContactableDoorRobot extends Robot implements SelectableObject, Sel
       this.handleRadius = handleRadius;
       this.handleLength = handleLength;
       
-      createDoor(new Vector3D(positionInWorld));
+      createDoor(new Vector3D(positionInWorld), yawInWorld);
       createDoorGraphics();
       createHandle();
       createHandleGraphics();
 
       
       // set up reference frames
-      originalDoorPose = new RigidBodyTransform(new AxisAngle(), new Vector3D(positionInWorld)); 
-      doorFrame = new PoseReferenceFrame("doorFrame", new FramePose3D(ReferenceFrame.getWorldFrame(), new Point3D(positionInWorld), new AxisAngle()));
+      originalDoorPose = new RigidBodyTransform(new AxisAngle(0.0, 0.0, 0.0), new Vector3D(positionInWorld));
+      doorFrame = new PoseReferenceFrame("doorFrame", new FramePose3D(ReferenceFrame.getWorldFrame(), new Point3D(positionInWorld), new AxisAngle(0.0, 0.0, 0.0)));
       doorBox = new FrameBox3D(doorFrame, widthX, depthY, heightZ);
       
       for(RobotSide robotSide : RobotSide.values())
@@ -130,16 +136,17 @@ public class ContactableDoorRobot extends Robot implements SelectableObject, Sel
       internalMultiJointArticulatedContactable = new InternalMultiJointArticulatedContactable(getName(), this);
    }
 
-   private void createDoor(Vector3D positionInWorld)
+   private void createDoor(Vector3D positionInWorld, double yawInWorld)
    {
       // creating the pinJoint, i.e. door hinge
       doorHingePinJoint = new PinJoint("doorHingePinJoint", positionInWorld, this, Axis3D.Z);
+      doorHingePinJoint.getOffsetTransform3D().getRotation().setYawPitchRoll(yawInWorld, 0.0, 0.0);
       
       // door link
       doorLink = new Link("doorLink");
       doorLink.setMass(mass);
       doorLink.setComOffset(0.5*widthX, 0.5*depthY, 0.5*heightZ);
-      
+
       inertiaMatrix = RotationalInertiaCalculator.getRotationalInertiaMatrixOfSolidBox(widthX, depthY, heightZ, mass);
       doorLink.setMomentOfInertia(inertiaMatrix);
       doorHingePinJoint.setLink(doorLink);
